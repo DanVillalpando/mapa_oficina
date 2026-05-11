@@ -45,11 +45,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 #loading-text{font-size:13px;color:#888}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-#map-container{position:relative;overflow:hidden;height:calc(100vh - 120px);background:#ccc;cursor:grab;display:flex;align-items:center;justify-content:center}
+#map-container{position:relative;overflow:auto;height:calc(100vh - 88px);background:#ccc;cursor:grab;display:flex;align-items:center;justify-content:center}
 #map-container.locate-mode{cursor:crosshair}
 #map-container:active:not(.locate-mode){cursor:grabbing}
-#map-wrap{position:relative;display:flex;width:100%;height:100%}
-#floor-img{display:block;width:100%;height:100%;object-fit:contain}
+#map-wrap{position:relative;display:inline-block;width:100%;height:100%}
+#floor-img{display:block;width:100%;height:auto;object-fit:contain}
 #pins-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
 .pin{position:absolute;transform:translate(-50%,-50%);pointer-events:all;cursor:pointer;z-index:10}
 .pin-circle{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff;transition:transform .12s,box-shadow .12s;box-shadow:0 1px 5px rgba(0,0,0,0.3);letter-spacing:-.3px;user-select:none}
@@ -86,11 +86,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 @media (max-width: 767px) {
   #header h1{font-size:12px}
   #search{width:120px}
-  #legend{display:none} /* ocupa demasiado espacio en vertical */
-  #map-container{height:calc(100vh - 88px)}
+  #legend{display:none}
+  #map-container{height:calc(100vh - 88px);overflow-y:auto;overflow-x:hidden;cursor:default}
+  #map-wrap{width:100%;height:auto;display:block}
+  #floor-img{width:100%;height:auto;object-fit:unset}
+  #pins-layer{height:auto;position:absolute;top:0;left:0;width:100%}
   .pin-circle{width:20px;height:20px;font-size:7.5px}
   #panel{width:calc(100vw - 32px);right:16px;bottom:12px}
-  #panel.shift{right:16px} /* en móvil el panel de pendientes cubre, no desplaza */
+  #panel.shift{right:16px}
   #pendientes-panel{width:100%;top:88px;height:calc(100vh - 88px)}
 }
 </style>
