@@ -96,6 +96,48 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   #panel.shift{right:16px}
   #pendientes-panel{width:100%;top:88px;height:calc(100vh - 88px)}
 }
+  /* ── Tooltip con foto ── */
+.pin-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  padding: 8px;
+  width: 130px;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 50;
+  white-space: normal;
+}
+.pin:hover .pin-tooltip { opacity: 1; }
+.pin-tooltip img {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid #eee;
+  display: block;
+  margin: 0 auto 5px;
+}
+.pin-tooltip-nombre {
+  font-size: 11px;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.3;
+}
+.pin-tooltip-noimg {
+  font-size: 11px;
+  font-weight: 600;
+  color: #222;
+  padding: 4px 0;
+  line-height: 1.3;
+}
 </style>
 </head>
 <body>
@@ -223,7 +265,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "CESAR_ALEXEI_CARRIZALES_MAYORGA.jpeg"
   },
   {
     "id": 3,
@@ -238,7 +281,8 @@ const personalBase = [
     "matricula": "311094967",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "DANIEL_ENRIQUE_VILLALPANDO_CHAVEZ.jpeg"
   },
   {
     "id": 4,
@@ -253,7 +297,8 @@ const personalBase = [
     "matricula": "311095381",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "INES_HERRERA_GARCIA.jpeg"
   },
   {
     "id": 5,
@@ -268,7 +313,8 @@ const personalBase = [
     "matricula": "311093070",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "SUEMI_MYRIAM_VELAZQUEZ_TORRES.png"
   },
   {
     "id": 6,
@@ -283,7 +329,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "CLAUDIA_LORENA_TOSCANO_CHAVEZ.jpeg"
   },
   {
     "id": 7,
@@ -298,7 +345,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "NALLELY_IRENE_CABALLERO_GUZMAN.jpeg"
   },
   {
     "id": 8,
@@ -313,7 +361,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "LUCIA_ILEANA_VILLALON_TRUJILLO.png"
   },
   {
     "id": 9,
@@ -328,7 +377,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "HUMBERTO_LEON_PALOMINO.jpeg"
   },
   {
     "id": 10,
@@ -343,7 +393,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "FERNANDO_MENDOZA_ELVIRA.jpeg"
   },
   {
     "id": 11,
@@ -358,7 +409,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "TERESA_FLORES_VALENCIA.jpeg"
   },
   {
     "id": 12,
@@ -373,7 +425,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ANA_MARIA_GARDUNO_GARCIA.jpeg"
   },
   {
     "id": 13,
@@ -388,7 +441,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "BRISA_CELESTE_MARQUEZ_GONZALEZ.jpeg"
   },
   {
     "id": 14,
@@ -403,7 +457,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "MARIO_RAMIREZ_ALVARADO.jpeg"
   },
   {
     "id": 15,
@@ -418,7 +473,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "YENIFER_STHEPHANIE_MARTINEZ_RIVERA.jpeg"
   },
   {
     "id": 16,
@@ -433,7 +489,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "OSCAR_VILLANUEVA_OLIVARES.jpeg"
   },
   {
     "id": 17,
@@ -448,7 +505,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "CARLOS_ALBERTO_ROJAS_HEREDIA.jpeg"
   },
   {
     "id": 18,
@@ -463,7 +521,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "VICENTA_MIRYAM_ROMAN_NAVARRETE.jpeg"
   },
   {
     "id": 19,
@@ -478,7 +537,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "EDGAR_ALEJANDRO_PEREZ_LUNA.jpeg"
   },
   {
     "id": 20,
@@ -523,7 +583,8 @@ const personalBase = [
     "matricula": "311092593",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JOSE_ALFONSO_GARFIAS_CORONA.jpeg"
   },
   {
     "id": 23,
@@ -538,7 +599,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALEJANDRO_TONATIUH_GUZMAN_MEDELLIN.jpeg"
   },
   {
     "id": 24,
@@ -553,7 +615,8 @@ const personalBase = [
     "matricula": "311095748",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "LUIS_DAVID_ROMAN_RUIZ.jpeg"
   },
   {
     "id": 25,
@@ -568,7 +631,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "IVONNE_ENRIQUETA_REYES_CARDENAS.png"
   },
   {
     "id": 26,
@@ -583,7 +647,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "MARTHA_SUSANA_HERNANDEZ_RANGEL.jpeg"
   },
   {
     "id": 27,
@@ -598,7 +663,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "ADRIAN_PICHARDO_LEYTE.jpeg"
   },
   {
     "id": 28,
@@ -613,7 +679,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "VICTOR_MANUEL_SANCHEZ_TAFOYA.jpeg"
   },
   {
     "id": 29,
@@ -628,7 +695,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "RAUL_ALAMEDA_DE_LA_MORA.png"
   },
   {
     "id": 30,
@@ -643,7 +711,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "MARIO_EMILIO_SIGUENZA_CAMACHO.png"
   },
   {
     "id": 31,
@@ -673,7 +742,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "MARIA_KARINA_SANCHEZ_TORRES.jpeg"
   },
   {
     "id": 33,
@@ -688,7 +758,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "NOHEMI_RUIZ_ANGELES.png"
   },
   {
     "id": 34,
@@ -718,7 +789,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "DIANA_RAQUEL_OLIVARES_CARMONA.jpg"
   },
   {
     "id": 36,
@@ -733,7 +805,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALEJANDRO_FONG_SURIANO.png"
   },
   {
     "id": 37,
@@ -748,7 +821,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "CHRISTIAN_PALOMINO_GARCIA.jpeg"
   },
   {
     "id": 38,
@@ -763,7 +837,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "FERNANDO_MENDOZA_AQUINO.jpeg"
   },
   {
     "id": 39,
@@ -778,7 +853,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JOSE_REGULO_LOPEZ_ACEVES.jpeg"
   },
   {
     "id": 40,
@@ -793,7 +869,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JOSE_LUIS_DIAZ_LARA.jpeg"
   },
   {
     "id": 41,
@@ -808,7 +885,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "MIGUEL_ANGEL_GONZALEZ_BAUTISTA.png"
   },
   {
     "id": 42,
@@ -823,7 +901,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "VANESSA_PAULINA_DE_SANJUAN_GONZALEZ.png"
   },
   {
     "id": 43,
@@ -838,7 +917,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "PEDRO_YAIR_GOMEZ_RIVERA.jpeg"
   },
   {
     "id": 44,
@@ -853,7 +933,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "MIGUEL_ANGEL_MONTOYA_CHAVEZ.jpeg"
   },
   {
     "id": 45,
@@ -868,7 +949,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "AMISADAI_PAMELA_CABALLERO_LOPEZ.jpeg"
   },
   {
     "id": 46,
@@ -883,7 +965,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "KARLA_VAZQUEZ_DEL_ANGEL.png"
   },
   {
     "id": 47,
@@ -898,7 +981,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ENRIQUE_JOEL_BALTAZARES_LUNA.jpeg"
   },
   {
     "id": 48,
@@ -913,7 +997,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "KARLA_GABRIELA_ISLAS_ALONSO.png"
   },
   {
     "id": 49,
@@ -928,7 +1013,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ARACELI_GARCIA_GARCIA.jpeg"
   },
   {
     "id": 50,
@@ -943,7 +1029,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "LORENA_RODRIGUEZ_PANTOJA.png"
   },
   {
     "id": 51,
@@ -958,7 +1045,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ZAIRA_LILIANA_JIMENEZ_SEADE.png"
   },
   {
     "id": 52,
@@ -973,7 +1061,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "ESTEFANIA_MONSERRAT_RAMIREZ_SABIDO.jpeg"
   },
   {
     "id": 53,
@@ -988,7 +1077,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "AIDEE_SUSANA_GARCIA_AGUILAR.png"
   },
   {
     "id": 54,
@@ -1003,7 +1093,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "RUBEN_ISRAEL_MARTINEZ_MEDINA.jpeg"
   },
   {
     "id": 55,
@@ -1018,7 +1109,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "CLAUDIA_PAVON_GOMEZ.jpeg"
   },
   {
     "id": 56,
@@ -1033,7 +1125,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "NAXHIELI_BERENICE_VALERIO_LOPEZ.jpeg"
   },
   {
     "id": 57,
@@ -1048,7 +1141,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "LESLIE_GUADALUPE_ROMERO_BARRIGA.jpeg"
   },
   {
     "id": 58,
@@ -1078,7 +1172,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "RICARDO_ISRAEL_QUINTANAR_CARRILLO.jpeg"
   },
   {
     "id": 60,
@@ -1093,7 +1188,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "GUILLERMINA_JUAREZ_CONTRERAS.png"
   },
   {
     "id": 61,
@@ -1108,7 +1204,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "BLANCA_ESTELA_GARCIA_MACIAS.png"
   },
   {
     "id": 62,
@@ -1123,7 +1220,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "MARCO_EMMANUEL_MEDINA_AMADOR.jpeg"
   },
   {
     "id": 63,
@@ -1138,7 +1236,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "EDGAR_CAMACHO_ACOSTA.jpeg"
   },
   {
     "id": 64,
@@ -1153,7 +1252,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "GEORGINA_DE_LA_PAZ_PANTOJA.jpeg"
   },
   {
     "id": 65,
@@ -1168,7 +1268,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "KEVIN_RUBEN_MARQUEZ_GONZALEZ.jpeg"
   },
   {
     "id": 66,
@@ -1183,7 +1284,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "ROSENDO_RENE_REBOLLEDO_MARQUEZ.jpeg"
   },
   {
     "id": 67,
@@ -1198,7 +1300,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "XOCHITL_SALGADO_FLORES.jpeg"
   },
   {
     "id": 68,
@@ -1213,7 +1316,8 @@ const personalBase = [
     "matricula": "311094839",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "SAUL_GONZALEZ_MARTINEZ.jpeg"
   },
   {
     "id": 69,
@@ -1228,7 +1332,8 @@ const personalBase = [
     "matricula": "311094840",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "SANTANA_ALFONSO_VALDES_BADILLO.jpeg"
   },
   {
     "id": 70,
@@ -1243,7 +1348,8 @@ const personalBase = [
     "matricula": "311091292",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "TANIA_ESTEFANIA_GUTIERREZ_CASTRUITA.jpg"
   },
   {
     "id": 71,
@@ -1258,7 +1364,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALICIA_CAMPOS_CABALLERO.png"
   },
   {
     "id": 72,
@@ -1273,7 +1380,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ERIK_ALFREDO_GAONA_REYES.jpeg"
   },
   {
     "id": 73,
@@ -1288,7 +1396,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "RAFAEL_PEREZ_FIGUEROA.jpeg"
   },
   {
     "id": 74,
@@ -1303,7 +1412,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALEJANDRO_MORALES_MADRIGAL.png"
   },
   {
     "id": 75,
@@ -1318,7 +1428,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "CINTHYA_MILER_SALINAS.jpeg"
   },
   {
     "id": 76,
@@ -1333,7 +1444,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "
   },
   {
     "id": 77,
@@ -1709,7 +1821,17 @@ function initPins() {
     c.className = 'pin-circle'; c.style.background = d.color;
     const p = d.nombre.trim().split(' ');
     c.textContent = (p[0]?.[0] || '').toUpperCase() + (p[1]?.[0] || '').toUpperCase();
-    c.title = d.nombre; pin.appendChild(c);
+    pin.appendChild(c);
+    // Tooltip fotos
+    const tt = document.createElement('div');
+    tt.className = 'pin-tooltip';
+    if (d.foto) {
+      tt.innerHTML = `<img src="fotos_personal/${d.foto}" alt="${d.nombre}" onerror="this.style.display='none'">
+        <div class="pin-tooltip-nombre">${d.nombre}</div>`;
+    } else {
+      tt.innerHTML = `<div class="pin-tooltip-noimg">${d.nombre}</div>`;
+    }
+    pin.appendChild(tt); // Suguerencia de Claude para mostrar fotos
     pin.addEventListener('click', e => { if (!locateMode) { e.stopPropagation(); showPanel(d.id); } });
     makeDraggable(pin, d);
     layer.appendChild(pin);
