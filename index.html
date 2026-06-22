@@ -1826,7 +1826,7 @@ function initPins() {
     const tt = document.createElement('div');
     tt.className = 'pin-tooltip';
     if (d.foto) {
-      tt.innerHTML = `<img src="fotos_personal/${d.foto}" alt="${d.nombre}" onerror="this.style.display='none'">
+      tt.innerHTML = `<img src="fotos_personal_ccops/${d.foto}" alt="${d.nombre}" onerror="this.style.display='none'">
         <div class="pin-tooltip-nombre">${d.nombre}</div>`;
     } else {
       tt.innerHTML = `<div class="pin-tooltip-noimg">${d.nombre}</div>`;
