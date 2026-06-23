@@ -96,10 +96,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   #panel.shift{right:16px}
   #pendientes-panel{width:100%;top:88px;height:calc(100vh - 88px)}
 }
-  /* ── Tooltip con foto ── */
+/* ── Tooltip con foto ── */
 .pin-tooltip {
   position: absolute;
-  bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
@@ -114,8 +113,29 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   transition: opacity .15s;
   z-index: 50;
   white-space: normal;
+  /* Por defecto aparece ARRIBA */
+  bottom: calc(100% + 8px);
+  top: auto;
 }
 .pin:hover .pin-tooltip { opacity: 1; }
+
+/* Si el pin tiene clase .tooltip-below, aparece ABAJO */
+.pin.tooltip-below .pin-tooltip {
+  top: calc(100% + 8px);
+  bottom: auto;
+}
+
+/* Evitar que se corte por los lados */
+.pin.tooltip-left .pin-tooltip {
+  left: 0;
+  transform: none;
+}
+.pin.tooltip-right .pin-tooltip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
 .pin-tooltip img {
   width: 72px; height: 72px;
   border-radius: 50%;
@@ -1849,6 +1869,14 @@ function initPins() {
     pin.addEventListener('click', e => { if (!locateMode) { e.stopPropagation(); showPanel(d.id); } });
     makeDraggable(pin, d);
     layer.appendChild(pin);
+    // Ajuste de posición del tooltip según ubicación del pin
+    (function ajustarTooltip() {
+      const y = parseFloat(pin.style.top);
+      const x = parseFloat(pin.style.left);
+      if (y < 25) pin.classList.add('tooltip-below');
+      if (x < 15) pin.classList.add('tooltip-left');
+      if (x > 85) pin.classList.add('tooltip-right');
+    })();
   });
   buildPendientesPanel(); updateCounts(); applyFilters();
 }
