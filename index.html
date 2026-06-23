@@ -111,14 +111,19 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   pointer-events: none;
   opacity: 0;
   transition: opacity .15s;
-  z-index: 50;
+  z-index: 200; /*Se cambia de 50 a 200*/
   white-space: normal;
   /* Por defecto aparece ARRIBA */
   bottom: calc(100% + 8px);
   top: auto;
 }
-.pin:hover .pin-tooltip { opacity: 1; }
-
+.pin:hover {
+  z-index: 200 !important;
+}
+.pin-tooltip /* se elimina { opacity: 1; } */
+{
+  z-index: 200;
+}
 /* Si el pin tiene clase .tooltip-below, aparece ABAJO */
 .pin.tooltip-below .pin-tooltip {
   top: calc(100% + 8px);
