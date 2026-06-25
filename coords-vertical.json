@@ -1,639 +1,639 @@
 [
   {
     "id": 1,
-    "uid": "47",
-    "nombre": "ANA ELISA OZUNA SANCHEZ",
-    "x": 48.52,
-    "y": 99.13
-  },
-  {
-    "id": 2,
     "uid": "1",
     "nombre": "CESAR ALEXEI CARRIZALES MAYORGA",
     "x": 75.68,
     "y": 15.68
   },
   {
-    "id": 3,
+    "id": 2,
     "uid": "2",
     "nombre": "DANIEL ENRIQUE VILLALPANDO CHÁVEZ",
     "x": 60,
     "y": 29.67
   },
   {
-    "id": 4,
+    "id": 3,
     "uid": "3",
     "nombre": "INES HERRERA GARCÍA",
     "x": 60.11,
     "y": 33.45
   },
   {
-    "id": 5,
+    "id": 4,
     "uid": "4",
     "nombre": "SUEMI MYRIAM VELAZQUEZ TORRES",
     "x": 46.48,
     "y": 31.03
   },
   {
-    "id": 6,
+    "id": 5,
     "uid": "5",
     "nombre": "CLAUDIA LORENA TOSCANO CHÁVEZ",
     "x": 58.98,
     "y": 22.59
   },
   {
-    "id": 7,
+    "id": 6,
     "uid": "6",
     "nombre": "NALLELY IRENE CABALLERO GUZMAN",
     "x": 39.89,
     "y": 55.07
   },
   {
-    "id": 8,
+    "id": 7,
     "uid": "7",
     "nombre": "LUCÍA ILEANA VILLALÓN TRUJILLO",
     "x": 26.02,
     "y": 14.39
   },
   {
-    "id": 9,
+    "id": 8,
     "uid": "9",
     "nombre": "HUMBERTO LEON PALOMINO",
     "x": 82.27,
     "y": 75.58
   },
   {
-    "id": 10,
+    "id": 9,
     "uid": "10",
     "nombre": "FERNANDO MENDOZA ELVIRA",
     "x": 19.66,
     "y": 75.09
   },
   {
-    "id": 11,
+    "id": 10,
     "uid": "52",
     "nombre": "TERESA VALENCIA FLORES",
     "x": 45.68,
     "y": 54.67
   },
   {
-    "id": 12,
+    "id": 11,
     "uid": "48",
     "nombre": "ANA MARIA GARDUÑO GARCIA",
     "x": 58.75,
     "y": 83.22
   },
   {
-    "id": 13,
+    "id": 12,
     "uid": "49",
     "nombre": "BRISA CELESTE MARQUEZ GONZALEZ",
     "x": 39.43,
     "y": 74.69
   },
   {
-    "id": 14,
+    "id": 13,
     "uid": "50",
     "nombre": "MARIO RAMIREZ ALVARADO",
     "x": 45.91,
     "y": 74.77
   },
   {
-    "id": 15,
+    "id": 14,
     "uid": "64",
     "nombre": "YENIFER STHEPHANIE MARTINEZ RIVERA",
     "x": 40,
     "y": 80.56
   },
   {
-    "id": 16,
+    "id": 15,
     "uid": "65",
     "nombre": "OSCAR VILLANUEVA OLIVARES",
     "x": 53.64,
     "y": 83.3
   },
   {
-    "id": 17,
+    "id": 16,
     "uid": "66",
     "nombre": "CARLOS ALBERTO ROJAS HEREDIA",
     "x": 39.66,
     "y": 83.46
   },
   {
-    "id": 18,
+    "id": 17,
     "uid": "75",
     "nombre": "VICENTA MIRYAM ROMAN NAVARRETE",
     "x": 20,
     "y": 62.15
   },
   {
-    "id": 19,
+    "id": 18,
     "uid": "84",
     "nombre": "EDGAR ALEJANDRO PÉREZ LUNA",
     "x": 110,
     "y": 15
   },
   {
-    "id": 20,
+    "id": 19,
     "uid": "85",
     "nombre": "GUSTAVO JIMÉNEZ MAYÉN",
     "x": 116,
     "y": 15
   },
   {
-    "id": 21,
+    "id": 20,
     "uid": "86",
     "nombre": "IVÁN RODRIGO OLLIVIER RIVERA",
     "x": 122,
     "y": 15
   },
   {
-    "id": 22,
+    "id": 21,
     "uid": "8",
     "nombre": "JOSÉ ALFONSO GARFIAS CORONA",
     "x": 39.2,
     "y": 87.56
   },
   {
-    "id": 23,
+    "id": 22,
     "uid": "11",
     "nombre": "ALEJANDRO TONATIUH GUZMAN MEDELLIN",
     "x": 18.07,
     "y": 28.86
   },
   {
-    "id": 24,
+    "id": 23,
     "uid": "12",
     "nombre": "LUIS DAVID ROMAN RUIZ",
     "x": 44.43,
     "y": 14.87
   },
   {
-    "id": 25,
+    "id": 24,
     "uid": "16",
     "nombre": "IVONNE ENRIQUETA REYES CARDENAS",
     "x": 35.91,
     "y": 19.22
   },
   {
-    "id": 26,
+    "id": 25,
     "uid": "21",
     "nombre": "MARTHA SUSANA HERNANDEZ RANGEL",
     "x": 17.84,
     "y": 23.64
   },
   {
-    "id": 27,
+    "id": 26,
     "uid": "60",
     "nombre": "ADRIAN PICHARDO LEYTE",
     "x": 34.66,
     "y": 87.48
   },
   {
-    "id": 28,
+    "id": 27,
     "uid": "68",
     "nombre": "VICTOR MANUEL SANCHEZ TAFOYA",
     "x": 24.09,
     "y": 62.07
   },
   {
-    "id": 29,
+    "id": 28,
     "uid": "71",
     "nombre": "RAUL ALAMEDA DE LA MORA",
     "x": 15.91,
     "y": 62.07
   },
   {
-    "id": 30,
+    "id": 29,
     "uid": "76",
     "nombre": "MARIO EMILIO SIGUIENZA CAMACHO",
     "x": 128,
     "y": 15
   },
   {
-    "id": 31,
+    "id": 30,
     "uid": "78",
     "nombre": "MARIBEL VILLEGAS CHÁVEZ",
     "x": 110,
     "y": 22
   },
   {
-    "id": 32,
+    "id": 31,
     "uid": "79",
     "nombre": "MARÍA KARINA SÁNCHEZ TORRES",
     "x": 116,
     "y": 22
   },
   {
-    "id": 33,
+    "id": 32,
     "uid": "82",
     "nombre": "NOHEMI RUIZ ANGELES",
     "x": 122,
     "y": 22
   },
   {
-    "id": 34,
+    "id": 33,
     "uid": "87",
     "nombre": "DIANA LAURA HERNÁNDEZ SANTAMARIA",
     "x": 128,
     "y": 22
   },
   {
-    "id": 35,
+    "id": 34,
     "uid": "29",
     "nombre": "DIANA RAQUEL OLIVARES CARMONA",
     "x": 71.48,
     "y": 74.69
   },
   {
-    "id": 36,
+    "id": 35,
     "uid": "30",
     "nombre": "ALEJANDRO FONG SURIANO",
     "x": 67.16,
     "y": 65.04
   },
   {
-    "id": 37,
+    "id": 36,
     "uid": "31",
     "nombre": "CHRISTIAN PALOMINO GARCIA",
     "x": 34.55,
     "y": 91.66
   },
   {
-    "id": 38,
+    "id": 37,
     "uid": "32",
     "nombre": "FERNANDO MENDOZA AQUINO",
     "x": 66.93,
     "y": 68.66
   },
   {
-    "id": 39,
+    "id": 38,
     "uid": "35",
     "nombre": "JOSE REGULO LOPEZ ACEVES",
     "x": 69.66,
     "y": 91.26
   },
   {
-    "id": 40,
+    "id": 39,
     "uid": "40",
     "nombre": "JOSE LUIS DIAZ LARA",
     "x": 56.82,
     "y": 91.42
   },
   {
-    "id": 41,
+    "id": 40,
     "uid": "58",
     "nombre": "MIGUEL ANGEL GONZÁLEZ BAUTISTA",
     "x": 82.5,
     "y": 65.12
   },
   {
-    "id": 42,
+    "id": 41,
     "uid": "59",
     "nombre": "VANESSA PAULINA DE SANJUAN GONZÁLEZ",
     "x": 38.86,
     "y": 91.74
   },
   {
-    "id": 43,
+    "id": 42,
     "uid": "67",
     "nombre": "PEDRO YAIR GOMEZ RIVERA",
     "x": 15.68,
     "y": 64.8
   },
   {
-    "id": 44,
+    "id": 43,
     "uid": "83",
     "nombre": "MIGUEL ANGEL MONTOYA CHÁVEZ",
     "x": 110,
     "y": 29
   },
   {
-    "id": 45,
+    "id": 44,
     "uid": "91",
     "nombre": "AMISADAI PAMELA CABALLERO LÓPEZ",
     "x": 116,
     "y": 29
   },
   {
-    "id": 46,
+    "id": 45,
     "uid": "22",
     "nombre": "KARLA VAZQUEZ DEL ANGEL",
     "x": 39.32,
     "y": 24.68
   },
   {
-    "id": 47,
+    "id": 46,
     "uid": "24",
     "nombre": "ENRIQUE JOEL BALTAZARES LUNA",
     "x": 25.8,
     "y": 52.9
   },
   {
-    "id": 48,
+    "id": 47,
     "uid": "25",
     "nombre": "KARLA GABRIELA ISLAS ALONSO",
     "x": 25.91,
     "y": 56.36
   },
   {
-    "id": 49,
+    "id": 48,
     "uid": "26",
     "nombre": "ARACELI GARCIA GARCIA",
     "x": 17.27,
     "y": 57.81
   },
   {
-    "id": 50,
+    "id": 49,
     "uid": "27",
     "nombre": "LORENA RODRIGUEZ PANTOJA",
     "x": 25.8,
     "y": 47.92
   },
   {
-    "id": 51,
+    "id": 50,
     "uid": "28",
     "nombre": "ZAIRA LILIANA JIMENEZ SEADE",
     "x": 17.39,
     "y": 52.26
   },
   {
-    "id": 52,
+    "id": 51,
     "uid": "55",
     "nombre": "ESTEFANIA MONSERRAT RAMÍREZ SABIDO",
     "x": 25.8,
     "y": 24.28
   },
   {
-    "id": 53,
+    "id": 52,
     "uid": "56",
     "nombre": "AIDEÉ SUSANA GARCÍA AGUILAR",
     "x": 43.75,
     "y": 80.48
   },
   {
-    "id": 54,
+    "id": 53,
     "uid": "57",
     "nombre": "RUBÉN ISRAEL MARTÍNEZ MEDINA",
     "x": 47.39,
     "y": 82.17
   },
   {
-    "id": 55,
+    "id": 54,
     "uid": "63",
     "nombre": "CLAUDIA PAVÓN GÓMEZ",
     "x": 35.68,
     "y": 83.46
   },
   {
-    "id": 56,
+    "id": 55,
     "uid": "70",
     "nombre": "NAXHIELI BERENICE VALERIO LOPEZ",
     "x": 19.89,
     "y": 64.8
   },
   {
-    "id": 57,
+    "id": 56,
     "uid": "77",
     "nombre": "LESLIE ROMERO BARRIGA",
     "x": 122,
     "y": 29
   },
   {
-    "id": 58,
-    "uid": "81",
-    "nombre": "ALFONSO MALDONADO ARELLANO",
-    "x": 128,
-    "y": 29
-  },
-  {
-    "id": 59,
+    "id": 57,
     "uid": "33",
     "nombre": "RICARDO ISRAEL QUINTANAR CARRILLO",
     "x": 60.45,
     "y": 65.12
   },
   {
-    "id": 60,
+    "id": 58,
     "uid": "34",
     "nombre": "GUILLERMINA JUAREZ CONTRERAS",
     "x": 46.02,
     "y": 48.08
   },
   {
-    "id": 61,
+    "id": 59,
     "uid": "36",
     "nombre": "BLANCA ESTELA GARCIA MACIAS",
     "x": 39.43,
     "y": 48.08
   },
   {
-    "id": 62,
+    "id": 60,
     "uid": "37",
     "nombre": "MARCO EMMANUEL MEDINA AMADOR",
     "x": 39.43,
     "y": 40.28
   },
   {
-    "id": 63,
+    "id": 61,
     "uid": "38",
     "nombre": "EDGAR CAMACHO ACOSTA",
     "x": 39.55,
     "y": 43.42
   },
   {
-    "id": 64,
+    "id": 62,
     "uid": "39",
     "nombre": "GEORGINA DE LA PAZ PANTOJA",
     "x": 45.91,
     "y": 43.9
   },
   {
-    "id": 65,
+    "id": 63,
     "uid": "41",
     "nombre": "KEVIN RUBEN MARQUEZ GONZALEZ",
     "x": 60.34,
     "y": 68.66
   },
   {
-    "id": 66,
+    "id": 64,
     "uid": "73",
     "nombre": "ROSENDO RENÉ REBOLLEDO MARQUEZ",
     "x": 23.98,
     "y": 64.8
   },
   {
-    "id": 67,
+    "id": 65,
     "uid": "89",
     "nombre": "XOCHITL SALGADO FLORES",
     "x": 110,
     "y": 36
   },
   {
-    "id": 68,
+    "id": 66,
     "uid": "13",
     "nombre": "SAUL GONZALEZ MARTINEZ",
     "x": 55,
     "y": 15.03
   },
   {
-    "id": 69,
+    "id": 67,
     "uid": "14",
     "nombre": "SANTANA ALFONSO VALDES BADILLO",
     "x": 46.02,
     "y": 24.76
   },
   {
-    "id": 70,
+    "id": 68,
     "uid": "15",
     "nombre": "TANIA ESTEFANIA GUTIERREZ CASTRUITA",
     "x": 26.14,
     "y": 34.17
   },
   {
-    "id": 71,
+    "id": 69,
     "uid": "17",
     "nombre": "ALICIA CAMPOS CABALLERO",
     "x": 43.07,
     "y": 19.06
   },
   {
-    "id": 72,
+    "id": 70,
     "uid": "18",
     "nombre": "ERIK ALFREDO GAONA REYES",
     "x": 17.84,
     "y": 34.41
   },
   {
-    "id": 73,
+    "id": 71,
     "uid": "19",
     "nombre": "RAFAEL PEREZ FIGUEROA",
     "x": 17.39,
     "y": 46.87
   },
   {
-    "id": 74,
+    "id": 72,
     "uid": "20",
     "nombre": "ALEJANDRO MORALES MADRIGAL",
     "x": 39.32,
     "y": 31.12
   },
   {
-    "id": 75,
+    "id": 73,
     "uid": "23",
     "nombre": "CINTHYA MILER SALINAS",
     "x": 39.2,
     "y": 28.06
   },
   {
-    "id": 76,
+    "id": 74,
     "uid": "51",
     "nombre": "JOSE RAMON RAMIREZ GOROSTIZA",
     "x": 26.25,
     "y": 28.62
   },
   {
-    "id": 77,
+    "id": 75,
     "uid": "53",
     "nombre": "ROBERTO RICARDEZ MENDOZA",
     "x": 39.55,
     "y": 33.85
   },
   {
-    "id": 78,
+    "id": 76,
     "uid": "54",
     "nombre": "RUEL ALEJANDRO LEYVA PAREDES",
     "x": 46.36,
     "y": 33.85
   },
   {
-    "id": 79,
+    "id": 77,
     "uid": "61",
     "nombre": "MAYRA LUZ AMBROCIO MÉNDEZ",
     "x": 35.45,
     "y": 80.72
   },
   {
-    "id": 80,
+    "id": 78,
     "uid": "62",
     "nombre": "GUILLERMO MANRIQUE FERNANDEZ",
     "x": 43.86,
     "y": 83.46
   },
   {
-    "id": 81,
+    "id": 79,
     "uid": "69",
     "nombre": "MARIANA CRUZ FRAGOSO",
     "x": 15.45,
     "y": 67.54
   },
   {
-    "id": 82,
+    "id": 80,
     "uid": "72",
     "nombre": "JESSICA MAQUEDA RAMOS",
     "x": 20,
     "y": 67.54
   },
   {
-    "id": 83,
+    "id": 81,
     "uid": "74",
     "nombre": "MARCOS RODRIGO MALDONADO LOPEZ",
     "x": 116,
     "y": 36
   },
   {
-    "id": 84,
+    "id": 82,
     "uid": "80",
     "nombre": "BERENICE ALEJANDRA GARCÍA OROZCO",
     "x": 122,
     "y": 36
   },
   {
-    "id": 85,
+    "id": 83,
     "uid": "88",
     "nombre": "VERÓNICA NOEMI NOGUERÓN SAN MIGUEL",
     "x": 128,
     "y": 36
   },
   {
-    "id": 86,
+    "id": 84,
     "uid": "90",
     "nombre": "ALEXA NAIAN PALENCIA FERNÁNDEZ",
     "x": 110,
     "y": 43
   },
   {
-    "id": 87,
+    "id": 85,
     "uid": "42",
     "nombre": "LILIANA ELIZABETH RAMOS ROLDAN",
     "x": 46.02,
     "y": 62.87
   },
   {
-    "id": 88,
+    "id": 86,
     "uid": "43",
     "nombre": "JOSE ARMANDO ZAMUDIO CAMARILLO",
     "x": 45.91,
     "y": 40.28
   },
   {
-    "id": 89,
+    "id": 87,
     "uid": "44",
     "nombre": "ALFONSO ALVARADO RAYA",
     "x": 46.36,
     "y": 67.54
   },
   {
-    "id": 90,
+    "id": 88,
     "uid": "45",
     "nombre": "JULIETA DEL CONSUELO ROJAS PEÑA",
     "x": 39.2,
     "y": 63.11
   },
   {
-    "id": 91,
+    "id": 89,
     "uid": "46",
     "nombre": "JUAN PEDRO ESPINOZA CASTELLANOS",
     "x": 39.66,
     "y": 67.62
+  },
+  {
+    "id": 90,
+    "uid": "92",
+    "nombre": "JULIO CÉSAR TELLEZ GUERRERO",
+    "x": 69.34,
+    "y": 48.23
+  },
+  {
+    "id": 91,
+    "uid": "93",
+    "nombre": "JULIA ANAHI MIRANDA ESPINOSA",
+    "x": 59.18,
+    "y": 60.74
   }
 ]
