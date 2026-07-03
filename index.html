@@ -26,6 +26,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 .fb-dnaj.active{color:#6A1B9A;border-color:#6A1B9A;background:#F3E5F5}
 #mode-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #1565C0;color:#1565C0;background:#fff;cursor:pointer;font-weight:600;transition:all .15s}
 #mode-btn.active{background:#1565C0;color:#fff}
+#orgchart-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #37474F;color:#37474F;background:#fff;cursor:pointer;font-weight:600;transition:all .15s}
+#orgchart-btn.active{background:#37474F;color:#fff}
 #export-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #888;color:#555;background:#fff;cursor:pointer}
 #pendientes-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #757575;color:#555;background:#fff;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:5px;transition:all .15s;margin-left:auto}
 #pendientes-btn.active{background:#757575;color:#fff}
@@ -49,9 +51,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 #map-container.locate-mode{cursor:crosshair}
 #map-container:active:not(.locate-mode){cursor:grabbing}
 #map-wrap{position:relative;width:100%;height:100%}
-#floor-img{display:block;width:100%;height:100%;object-fit:contain}
+#floor-img{display:block;width:100%;height:100%;object-fit:contain;transition:opacity .5s ease}
+#floor-img.faded{opacity:0}
 #pins-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#org-lines{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:1;transition:opacity .35s ease}
+.org-line{stroke:#90A4AE;stroke-width:.28;fill:none;opacity:0;animation:lineFadeIn .5s ease forwards}
+@keyframes lineFadeIn{to{opacity:.85}}
 .pin{position:absolute;transform:translate(-50%,-50%);pointer-events:all;cursor:pointer;z-index:10}
+.pin.org-anim{transition:left .75s cubic-bezier(.4,0,.2,1), top .75s cubic-bezier(.4,0,.2,1)}
 .pin-circle{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff;transition:transform .12s,box-shadow .12s;box-shadow:0 1px 5px rgba(0,0,0,0.3);letter-spacing:-.3px;user-select:none}
 .pin:hover .pin-circle{transform:scale(1.5);box-shadow:0 3px 12px rgba(0,0,0,0.35)}
 .pin.hidden{display:none !important}
@@ -203,6 +210,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   <button class="filter-btn fb-dsaa" data-area="DSAA">DSAA (<span id="cnt-dsaa"></span>)</button>
   <button class="filter-btn fb-dnaj" data-area="DNAJ">DNAJ (<span id="cnt-dnaj"></span>)</button>
   <button id="mode-btn">&#x1F4CD; Modo ubicar</button>
+  <button id="orgchart-btn">&#128193; Organigrama</button>
   <button id="export-btn">&#128229; Exportar</button>
   <button id="pendientes-btn">⏳ Pendientes <span id="pendientes-badge">—</span></button>
 </div>
@@ -210,6 +218,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 <div id="map-container">
   <div id="map-wrap">
     <img id="floor-img" src="" alt="Plano CCOPS">
+    <svg id="org-lines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
     <div id="pins-layer"></div>
   </div>
 </div>
@@ -240,19 +249,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 //  CONFIGURACIÓN — ajusta estas rutas a tu repo
 // ─────────────────────────────────────────────
 const CONFIG = {
-  // Imágenes del plano en GitHub (raw URLs)
   img: {
     horizontal: 'imagen-horizontal-plano.jpg',
     vertical:   'imagen-vertical-plano.jpg'
   },
-  // JSONs de coordenadas en GitHub (raw URLs)
-  //   coords-horizontal.json → layout PC/landscape
-  //   coords-vertical.json   → layout móvil/portrait
   coords: {
     horizontal: 'coords-horizontal.json',
     vertical:   'coords-vertical.json'
   },
-  // Ancho máximo para considerar "móvil / portrait"
   mobileBreakpoint: 767
 };
 
@@ -261,1451 +265,187 @@ const CONFIG = {
 //  éstas se sobreescriben desde el JSON externo)
 // ─────────────────────────────────────────────
 const personalBase = [
-  {
-    "id": 1,
-    "uid": "1",
-    "nombre": "CESAR ALEXEI CARRIZALES MAYORGA",
-    "lugar": "01",
-    "area": "CCOPS",
-    "nomina": "Mando",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#2E7D32",
-    "foto": "CESAR_ALEXEI_CARRIZALES_MAYORGA.jpeg"
-  },
-  {
-    "id": 2,
-    "uid": "2",
-    "nombre": "DANIEL ENRIQUE VILLALPANDO CHÁVEZ",
-    "lugar": "04",
-    "area": "CCOPS",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "311094967",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#2E7D32",
-    "foto": "DANIEL_ENRIQUE_VILLALPANDO_CHAVEZ.jpeg"
-  },
-  {
-    "id": 3,
-    "uid": "3",
-    "nombre": "INES HERRERA GARCÍA",
-    "lugar": "04",
-    "area": "CCOPS",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "311095381",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#2E7D32",
-    "foto": "INES_HERRERA_GARCIA.jpeg"
-  },
-  {
-    "id": 4,
-    "uid": "4",
-    "nombre": "SUEMI MYRIAM VELAZQUEZ TORRES",
-    "lugar": "03",
-    "area": "CCOPS",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "311093070",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#2E7D32",
-    "foto": "SUEMI_MYRIAM_VELAZQUEZ_TORRES.png"
-  },
-  {
-    "id": 5,
-    "uid": "5",
-    "nombre": "CLAUDIA LORENA TOSCANO CHÁVEZ",
-    "lugar": "02",
-    "area": "CCOPS",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#2E7D32",
-    "foto": "CLAUDIA_LORENA_TOSCANO_CHAVEZ.jpeg"
-  },
-  {
-    "id": 6,
-    "uid": "6",
-    "nombre": "NALLELY IRENE CABALLERO GUZMAN",
-    "lugar": "05",
-    "area": "CCOPS",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#2E7D32",
-    "foto": "NALLELY_IRENE_CABALLERO_GUZMAN.jpeg"
-  },
-  {
-    "id": 7,
-    "uid": "7",
-    "nombre": "LUCÍA ILEANA VILLALÓN TRUJILLO",
-    "lugar": "07",
-    "area": "DPC",
-    "nomina": "Mando",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "LUCIA_ILEANA_VILLALON_TRUJILLO.png"
-  },
-  {
-    "id": 8,
-    "uid": "9",
-    "nombre": "HUMBERTO LEON PALOMINO",
-    "lugar": "31",
-    "area": "DSAA",
-    "nomina": "Mando",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "HUMBERTO_LEON_PALOMINO.jpeg"
-  },
-  {
-    "id": 9,
-    "uid": "10",
-    "nombre": "FERNANDO MENDOZA ELVIRA",
-    "lugar": "50",
-    "area": "DNAJ",
-    "nomina": "Mando",
-    "estatus": "Activo",
-    "adscripcion": "ccops",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#2E7D32",
-    "foto": "FERNANDO_MENDOZA_ELVIRA.jpeg"
-  },
-  {
-    "id": 10,
-    "uid": "52",
-    "nombre": "TERESA VALENCIA FLORES",
-    "lugar": "05",
-    "area": "CCOPS",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 1er bloque",
-    "adscripcion": "ccops",
-    "categoria": "Analista E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#1565C0",
-    "foto": "TERESA_FLORES_VALENCIA.jpeg"
-  },
-  {
-    "id": 11,
-    "uid": "48",
-    "nombre": "ANA MARIA GARDUÑO GARCIA",
-    "lugar": "51",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#2E7D32",
-    "foto": "ANA_MARIA_GARDUNO_GARCIA.jpeg"
-  },
-  {
-    "id": 12,
-    "uid": "49",
-    "nombre": "BRISA CELESTE MARQUEZ GONZALEZ",
-    "lugar": "53",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#2E7D32",
-    "foto": "BRISA_CELESTE_MARQUEZ_GONZALEZ.jpeg"
-  },
-  {
-    "id": 13,
-    "uid": "50",
-    "nombre": "MARIO RAMIREZ ALVARADO",
-    "lugar": "52",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#2E7D32",
-    "foto": "MARIO_RAMIREZ_ALVARADO.jpeg"
-  },
-  {
-    "id": 14,
-    "uid": "64",
-    "nombre": "YENIFER STHEPHANIE MARTINEZ RIVERA",
-    "lugar": "Sala de juntas",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "Supervisor de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#F57F17",
-    "foto": "YENIFER_STHEPHANIE_MARTINEZ_RIVERA.jpeg"
-  },
-  {
-    "id": 15,
-    "uid": "65",
-    "nombre": "OSCAR VILLANUEVA OLIVARES",
-    "lugar": "51",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "Supervisor de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#F57F17",
-    "foto": "OSCAR_VILLANUEVA_OLIVARES.jpeg"
-  },
-  {
-    "id": 16,
-    "uid": "66",
-    "nombre": "CARLOS ALBERTO ROJAS HEREDIA",
-    "lugar": "Sala de juntas",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "Analista E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#F57F17",
-    "foto": "CARLOS_ALBERTO_ROJAS_HEREDIA.jpeg"
-  },
-  {
-    "id": 17,
-    "uid": "75",
-    "nombre": "VICENTA MIRYAM ROMAN NAVARRETE",
-    "lugar": "Sala de juntas",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 3er bloque",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "Supervisor de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#BF360C",
-    "foto": "VICENTA_MIRYAM_ROMAN_NAVARRETE.jpeg"
-  },
-  {
-    "id": 18,
-    "uid": "84",
-    "nombre": "EDGAR ALEJANDRO PÉREZ LUNA",
-    "lugar": "Sala de juntas",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "Jefe de Área NC E0",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#6A1B9A",
-    "ecolor": "#757575",
-    "foto": "EDGAR_ALEJANDRO_PEREZ_LUNA.jpeg"
-  },
-  {
-    "id": 19,
-    "uid": "85",
-    "nombre": "GUSTAVO JIMÉNEZ MAYÉN",
-    "lugar": "Sala de juntas",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Pendiente",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "Supervisor de Proyectos E1",
-    "matricula": "",
-    "grupo": "pendiente",
-    "color": "#6A1B9A",
-    "ecolor": "#757575"
-  },
-  {
-    "id": 20,
-    "uid": "86",
-    "nombre": "IVÁN RODRIGO OLLIVIER RIVERA",
-    "lugar": "Sala de juntas",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Pendiente",
-    "adscripcion": "División de Normatividad y Asesoría Jurídica",
-    "categoria": "Supervisor de Proyectos E1",
-    "matricula": "",
-    "grupo": "pendiente",
-    "color": "#6A1B9A",
-    "ecolor": "#757575"
-  },
-  {
-    "id": 21,
-    "uid": "8",
-    "nombre": "JOSÉ ALFONSO GARFIAS CORONA",
-    "lugar": "09",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "",
-    "matricula": "311092593",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "JOSE_ALFONSO_GARFIAS_CORONA.jpeg"
-  },
-  {
-    "id": 22,
-    "uid": "11",
-    "nombre": "ALEJANDRO TONATIUH GUZMAN MEDELLIN",
-    "lugar": "10",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "ALEJANDRO_TONATIUH_GUZMAN_MEDELLIN.jpeg"
-  },
-  {
-    "id": 23,
-    "uid": "12",
-    "nombre": "LUIS DAVID ROMAN RUIZ",
-    "lugar": "08",
-    "area": "DPC",
-    "nomina": "Mando",
-    "estatus": "Activo",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "",
-    "matricula": "311095748",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "LUIS_DAVID_ROMAN_RUIZ.jpeg"
-  },
-  {
-    "id": 24,
-    "uid": "16",
-    "nombre": "IVONNE ENRIQUETA REYES CARDENAS",
-    "lugar": "11",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "IVONNE_ENRIQUETA_REYES_CARDENAS.png"
-  },
-  {
-    "id": 25,
-    "uid": "21",
-    "nombre": "MARTHA SUSANA HERNANDEZ RANGEL",
-    "lugar": "21",
-    "area": "DPC",
-    "nomina": "Mando",
-    "estatus": "Activo",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "MARTHA_SUSANA_HERNANDEZ_RANGEL.jpeg"
-  },
-  {
-    "id": 26,
-    "uid": "60",
-    "nombre": "ADRIAN PICHARDO LEYTE",
-    "lugar": "09",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "Analista E2",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#F57F17",
-    "foto": "ADRIAN_PICHARDO_LEYTE.jpeg"
-  },
-  {
-    "id": 27,
-    "uid": "68",
-    "nombre": "VICTOR MANUEL SANCHEZ TAFOYA",
-    "lugar": "Sala de juntas",
-    "area": "CCOPS",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 3er bloque",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "Analista E2",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#BF360C",
-    "foto": "VICTOR_MANUEL_SANCHEZ_TAFOYA.jpeg"
-  },
-  {
-    "id": 28,
-    "uid": "71",
-    "nombre": "RAUL ALAMEDA DE LA MORA",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 3er bloque",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "Analista E3",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#BF360C",
-    "foto": "RAUL_ALAMEDA_DE_LA_MORA.png"
-  },
-  {
-    "id": 29,
-    "uid": "76",
-    "nombre": "MARIO EMILIO SIGUIENZA CAMACHO",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "Jefe de Área NC E0",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#757575",
-    "foto": "MARIO_EMILIO_SIGUENZA_CAMACHO.png"
-  },
-  {
-    "id": 30,
-    "uid": "79",
-    "nombre": "MARÍA KARINA SÁNCHEZ TORRES",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#757575",
-    "foto": "MARIA_KARINA_SANCHEZ_TORRES.jpeg"
-  },
-  {
-    "id": 31,
-    "uid": "82",
-    "nombre": "NOHEMI RUIZ ANGELES",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "Analista E2",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#757575",
-    "foto": "NOHEMI_RUIZ_ANGELES.png"
-  },
-  {
-    "id": 32,
-    "uid": "87",
-    "nombre": "DIANA LAURA HERNÁNDEZ SANTAMARIA",
-    "lugar": "Sala de juntas",
-    "area": "DNAJ",
-    "nomina": "Ordinaria",
-    "estatus": "Pendiente",
-    "adscripcion": "División de Procesos de Contratación",
-    "categoria": "Analista E1",
-    "matricula": "",
-    "grupo": "pendiente",
-    "color": "#6A1B9A",
-    "ecolor": "#757575"
-  },
-  {
-    "id": 33,
-    "uid": "29",
-    "nombre": "DIANA RAQUEL OLIVARES CARMONA",
-    "lugar": "33",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "DIANA_RAQUEL_OLIVARES_CARMONA.jpg"
-  },
-  {
-    "id": 34,
-    "uid": "30",
-    "nombre": "ALEJANDRO FONG SURIANO",
-    "lugar": "34",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "ALEJANDRO_FONG_SURIANO.png"
-  },
-  {
-    "id": 35,
-    "uid": "31",
-    "nombre": "CHRISTIAN PALOMINO GARCIA",
-    "lugar": "32",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "CHRISTIAN_PALOMINO_GARCIA.jpeg"
-  },
-  {
-    "id": 36,
-    "uid": "32",
-    "nombre": "FERNANDO MENDOZA AQUINO",
-    "lugar": "35",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "FERNANDO_MENDOZA_AQUINO.jpeg"
-  },
-  {
-    "id": 37,
-    "uid": "35",
-    "nombre": "JOSE REGULO LOPEZ ACEVES",
-    "lugar": "36",
-    "area": "DSAA",
-    "nomina": "Mando",
-    "estatus": "Activo",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "JOSE_REGULO_LOPEZ_ACEVES.jpeg"
-  },
-  {
-    "id": 38,
-    "uid": "40",
-    "nombre": "JOSE LUIS DIAZ LARA",
-    "lugar": "43",
-    "area": "DSAA",
-    "nomina": "Mando",
-    "estatus": "Activo",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "JOSE_LUIS_DIAZ_LARA.jpeg"
-  },
-  {
-    "id": 39,
-    "uid": "58",
-    "nombre": "MIGUEL ANGEL GONZÁLEZ BAUTISTA",
-    "lugar": "Sala de juntas",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "Jefe de Área NC E0",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#F57F17",
-    "foto": "MIGUEL_ANGEL_GONZALEZ_BAUTISTA.png"
-  },
-  {
-    "id": 40,
-    "uid": "59",
-    "nombre": "VANESSA PAULINA DE SANJUAN GONZÁLEZ",
-    "lugar": "32",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "Analista E2",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#F57F17",
-    "foto": "VANESSA_PAULINA_DE_SANJUAN_GONZALEZ.png"
-  },
-  {
-    "id": 41,
-    "uid": "67",
-    "nombre": "PEDRO YAIR GOMEZ RIVERA",
-    "lugar": "Sala de juntas",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 3er bloque",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "Analista E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#BF360C",
-    "foto": "PEDRO_YAIR_GOMEZ_RIVERA.jpeg"
-  },
-  {
-    "id": 42,
-    "uid": "83",
-    "nombre": "MIGUEL ANGEL MONTOYA CHÁVEZ",
-    "lugar": "Sala de juntas",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "Jefe de Área NC E0",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#757575",
-    "foto": "MIGUEL_ANGEL_MONTOYA_CHAVEZ.jpeg"
-  },
-  {
-    "id": 43,
-    "uid": "91",
-    "nombre": "AMISADAI PAMELA CABALLERO LÓPEZ",
-    "lugar": "Sala de juntas",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Pendiente",
-    "adscripcion": "División de Seguimiento y Atención a Auditorias",
-    "categoria": "Analista E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#757575",
-    "foto": "AMISADAI_PAMELA_CABALLERO_LOPEZ.jpeg"
-  },
-  {
-    "id": 44,
-    "uid": "22",
-    "nombre": "KARLA VAZQUEZ DEL ANGEL",
-    "lugar": "24",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "KARLA_VAZQUEZ_DEL_ANGEL.png"
-  },
-  {
-    "id": 45,
-    "uid": "24",
-    "nombre": "ENRIQUE JOEL BALTAZARES LUNA",
-    "lugar": "26",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "ENRIQUE_JOEL_BALTAZARES_LUNA.jpeg"
-  },
-  {
-    "id": 46,
-    "uid": "25",
-    "nombre": "KARLA GABRIELA ISLAS ALONSO",
-    "lugar": "27",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "KARLA_GABRIELA_ISLAS_ALONSO.png"
-  },
-  {
-    "id": 47,
-    "uid": "26",
-    "nombre": "ARACELI GARCIA GARCIA",
-    "lugar": "22",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "ARACELI_GARCIA_GARCIA.jpeg"
-  },
-  {
-    "id": 48,
-    "uid": "27",
-    "nombre": "LORENA RODRIGUEZ PANTOJA",
-    "lugar": "30",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "LORENA_RODRIGUEZ_PANTOJA.png"
-  },
-  {
-    "id": 49,
-    "uid": "28",
-    "nombre": "ZAIRA LILIANA JIMENEZ SEADE",
-    "lugar": "23",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "ZAIRA_LILIANA_JIMENEZ_SEADE.png"
-  },
-  {
-    "id": 50,
-    "uid": "55",
-    "nombre": "ESTEFANIA MONSERRAT RAMÍREZ SABIDO",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 1er bloque",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "Analista E2",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#1565C0",
-    "foto": "ESTEFANIA_MONSERRAT_RAMIREZ_SABIDO.jpeg"
-  },
-  {
-    "id": 51,
-    "uid": "56",
-    "nombre": "AIDEÉ SUSANA GARCÍA AGUILAR",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 1er bloque",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#1565C0",
-    "foto": "AIDEE_SUSANA_GARCIA_AGUILAR.png"
-  },
-  {
-    "id": 52,
-    "uid": "57",
-    "nombre": "RUBÉN ISRAEL MARTÍNEZ MEDINA",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 1er bloque",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#1565C0",
-    "foto": "RUBEN_ISRAEL_MARTINEZ_MEDINA.jpeg"
-  },
-  {
-    "id": 53,
-    "uid": "63",
-    "nombre": "CLAUDIA PAVÓN GÓMEZ",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#F57F17",
-    "foto": "CLAUDIA_PAVON_GOMEZ.jpeg"
-  },
-  {
-    "id": 54,
-    "uid": "70",
-    "nombre": "NAXHIELI BERENICE VALERIO LOPEZ",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 3er bloque",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "Analista E2",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#BF360C",
-    "foto": "NAXHIELI_BERENICE_VALERIO_LOPEZ.jpeg"
-  },
-  {
-    "id": 55,
-    "uid": "77",
-    "nombre": "LESLIE ROMERO BARRIGA",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "Subjefatura de División de Contratos y Convenios",
-    "categoria": "Supervisor de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#757575",
-    "foto": "LESLIE_GUADALUPE_ROMERO_BARRIGA.jpeg"
-  },
-  {
-    "id": 56,
-    "uid": "33",
-    "nombre": "RICARDO ISRAEL QUINTANAR CARRILLO",
-    "lugar": "41",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "RICARDO_ISRAEL_QUINTANAR_CARRILLO.jpeg"
-  },
-  {
-    "id": 57,
-    "uid": "34",
-    "nombre": "GUILLERMINA JUAREZ CONTRERAS",
-    "lugar": "25",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "GUILLERMINA_JUAREZ_CONTRERAS.png"
-  },
-  {
-    "id": 58,
-    "uid": "36",
-    "nombre": "BLANCA ESTELA GARCIA MACIAS",
-    "lugar": "37",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "BLANCA_ESTELA_GARCIA_MACIAS.png"
-  },
-  {
-    "id": 59,
-    "uid": "37",
-    "nombre": "MARCO EMMANUEL MEDINA AMADOR",
-    "lugar": "39",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "MARCO_EMMANUEL_MEDINA_AMADOR.jpeg"
-  },
-  {
-    "id": 60,
-    "uid": "38",
-    "nombre": "EDGAR CAMACHO ACOSTA",
-    "lugar": "40",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "EDGAR_CAMACHO_ACOSTA.jpeg"
-  },
-  {
-    "id": 61,
-    "uid": "39",
-    "nombre": "GEORGINA DE LA PAZ PANTOJA",
-    "lugar": "42",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "GEORGINA_DE_LA_PAZ_PANTOJA.jpeg"
-  },
-  {
-    "id": 62,
-    "uid": "41",
-    "nombre": "KEVIN RUBEN MARQUEZ GONZALEZ",
-    "lugar": "44",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "KEVIN_RUBEN_MARQUEZ_GONZALEZ.jpeg"
-  },
-  {
-    "id": 63,
-    "uid": "73",
-    "nombre": "ROSENDO RENÉ REBOLLEDO MARQUEZ",
-    "lugar": "Sala de juntas",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 3er bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#BF360C",
-    "foto": "ROSENDO_RENE_REBOLLEDO_MARQUEZ.jpeg"
-  },
-  {
-    "id": 64,
-    "uid": "89",
-    "nombre": "XOCHITL SALGADO FLORES",
-    "lugar": "Sala de juntas",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores",
-    "categoria": "Analista E3",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#757575",
-    "foto": "XOCHITL_SALGADO_FLORES.jpeg"
-  },
-  {
-    "id": 65,
-    "uid": "13",
-    "nombre": "SAUL GONZALEZ MARTINEZ",
-    "lugar": "13",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "311094839",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "SAUL_GONZALEZ_MARTINEZ.jpeg"
-  },
-  {
-    "id": 66,
-    "uid": "14",
-    "nombre": "SANTANA ALFONSO VALDES BADILLO",
-    "lugar": "17",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "311094840",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "SANTANA_ALFONSO_VALDES_BADILLO.jpeg"
-  },
-  {
-    "id": 67,
-    "uid": "15",
-    "nombre": "TANIA ESTEFANIA GUTIERREZ CASTRUITA",
-    "lugar": "18",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "311091292",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "TANIA_ESTEFANIA_GUTIERREZ_CASTRUITA.jpg"
-  },
-  {
-    "id": 68,
-    "uid": "17",
-    "nombre": "ALICIA CAMPOS CABALLERO",
-    "lugar": "16",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "ALICIA_CAMPOS_CABALLERO.png"
-  },
-  {
-    "id": 69,
-    "uid": "18",
-    "nombre": "ERIK ALFREDO GAONA REYES",
-    "lugar": "14",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "ERIK_ALFREDO_GAONA_REYES.jpeg"
-  },
-  {
-    "id": 70,
-    "uid": "19",
-    "nombre": "RAFAEL PEREZ FIGUEROA",
-    "lugar": "15",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "RAFAEL_PEREZ_FIGUEROA.jpeg"
-  },
-  {
-    "id": 71,
-    "uid": "20",
-    "nombre": "ALEJANDRO MORALES MADRIGAL",
-    "lugar": "19",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "ALEJANDRO_MORALES_MADRIGAL.png"
-  },
-  {
-    "id": 72,
-    "uid": "23",
-    "nombre": "CINTHYA MILER SALINAS",
-    "lugar": "20",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "CINTHYA_MILER_SALINAS.jpeg"
-  },
-  {
-    "id": 73,
-    "uid": "51",
-    "nombre": "JOSE RAMON RAMIREZ GOROSTIZA",
-    "lugar": "28",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32",
-    "foto": "JOSE_RAMON_RAMIREZ_GOROSTIZA.png"
-  },
-  {
-    "id": 74,
-    "uid": "53",
-    "nombre": "ROBERTO RICARDEZ MENDOZA",
-    "lugar": "46",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 1er bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#1565C0",
-    "foto": "ROBERTO_RICARDEZ_MENDOZA.jpeg"
-  },
-  {
-    "id": 75,
-    "uid": "54",
-    "nombre": "RUEL ALEJANDRO LEYVA PAREDES",
-    "lugar": "38",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 1er bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#1565C0",
-    "foto": "RUEL_ALEJANDRO_LEYVA_PAREDES.jpeg"
-  },
-  {
-    "id": 76,
-    "uid": "61",
-    "nombre": "MAYRA LUZ AMBROCIO MÉNDEZ",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#F57F17",
-    "foto": "MAYRA_LUZ_AMBROCIO_MENDEZ.png"
-  },
-  {
-    "id": 77,
-    "uid": "62",
-    "nombre": "GUILLERMO MANRIQUE FERNANDEZ",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 2ndo bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#F57F17",
-    "foto": "GUILLERMO_MANRIQUE_FERNANDEZ.png"
-  },
-  {
-    "id": 78,
-    "uid": "69",
-    "nombre": "MARIANA CRUZ FRAGOSO",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 3er bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Analista E2",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#BF360C",
-    "foto": "MARIANA_CRUZ_FRAGOSO.jpeg"
-  },
-  {
-    "id": 79,
-    "uid": "72",
-    "nombre": "JESSICA MAQUEDA RAMOS",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 3er bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#BF360C",
-    "foto": "JESSICA_MAQUEDA_RAMOS.jpeg"
-  },
-  {
-    "id": 80,
-    "uid": "74",
-    "nombre": "MARCOS RODRIGO MALDONADO LOPEZ",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Coord. de Proyectos E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#757575",
-    "foto": "MARCOS_RODRIGO_MALDONADO_LOPEZ.jpeg"
-  },
-  {
-    "id": 81,
-    "uid": "80",
-    "nombre": "BERENICE ALEJANDRA GARCÍA OROZCO",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Analista E2",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#757575",
-    "foto": "BERENICE_ALEJANDRA_GARCIA_OROZCO.jpeg"
-  },
-  {
-    "id": 82,
-    "uid": "88",
-    "nombre": "VERÓNICA NOEMI NOGUERÓN SAN MIGUEL",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Pendiente",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Analista E1",
-    "matricula": "",
-    "grupo": "pendiente",
-    "color": "#E65100",
-    "ecolor": "#757575"
-  },
-  {
-    "id": 83,
-    "uid": "90",
-    "nombre": "ALEXA NAIAN PALENCIA FERNÁNDEZ",
-    "lugar": "Sala de juntas",
-    "area": "DPC",
-    "nomina": "Ordinaria",
-    "estatus": "Nuevo ingreso 4to bloque",
-    "adscripcion": "Subjefatura de División de Procedimientos de Contratación",
-    "categoria": "Analista E1",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#757575",
-    "foto": "ALEXA_NAIAN_PALENCIA_FERNANDEZ.jpeg"
-  },
-  {
-    "id": 84,
-    "uid": "42",
-    "nombre": "LILIANA ELIZABETH RAMOS ROLDAN",
-    "lugar": "45",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Transparencia y Certificación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "LILIANA_ELIZABETH_RAMOS_ROLDAN.jpeg"
-  },
-  {
-    "id": 85,
-    "uid": "43",
-    "nombre": "JOSE ARMANDO ZAMUDIO CAMARILLO",
-    "lugar": "chofer",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Transparencia y Certificación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "JOSE_ARMANDO_ZAMUDIO_CAMARILLO.jpeg"
-  },
-  {
-    "id": 86,
-    "uid": "44",
-    "nombre": "ALFONSO ALVARADO RAYA",
-    "lugar": "47",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Transparencia y Certificación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "ALFONSO_ALVARADO_RAYA.jpeg"
-  },
-  {
-    "id": 87,
-    "uid": "45",
-    "nombre": "JULIETA DEL CONSUELO ROJAS PEÑA",
-    "lugar": "48",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Transparencia y Certificación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "JULIETA_DEL_CONSUELO_ROJAS_PENA.jpeg"
-  },
-  {
-    "id": 88,
-    "uid": "46",
-    "nombre": "JUAN PEDRO ESPINOZA CASTELLANOS",
-    "lugar": "49",
-    "area": "DSAA",
-    "nomina": "Ordinaria",
-    "estatus": "Activo",
-    "adscripcion": "Subjefatura de División de Transparencia y Certificación",
-    "categoria": "",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#2E7D32",
-    "ecolor": "#2E7D32",
-    "foto": "JUAN_PEDRO_ESPINOSA_CASTELLANOS.jpeg"
-  },
-  {
-    "id": 89,
-    "uid": "92",
-    "nombre": "JULIO CÉSAR TELLEZ GUERRERO",
-    "lugar": "16",
-    "area": "CCOPS",
-    "nomina": "-",
-    "estatus": "Servicio Social",
-    "adscripcion": "ccops",
-    "categoria": "Servicio Social",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#E65100",
-    "ecolor": "#2E7D32"
-  },
-  {
-    "id": 90,
-    "uid": "93",
-    "nombre": "JULIA ANAHI MIRANDA ESPINOSA",
-    "lugar": "04",
-    "area": "CCOPS",
-    "nomina": "-",
-    "estatus": "Servicio Social",
-    "adscripcion": "ccops",
-    "categoria": "Servicio Social",
-    "matricula": "",
-    "grupo": "mapa",
-    "color": "#1565C0",
-    "ecolor": "#1565C0"
-  }
+  {"id":1,"uid":"1","nombre":"CESAR ALEXEI CARRIZALES MAYORGA","lugar":"01","area":"CCOPS","nomina":"Mando","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"","grupo":"mapa","color":"#1565C0","ecolor":"#2E7D32","foto":"CESAR_ALEXEI_CARRIZALES_MAYORGA.jpeg"},
+  {"id":2,"uid":"2","nombre":"DANIEL ENRIQUE VILLALPANDO CHÁVEZ","lugar":"04","area":"CCOPS","nomina":"Ordinaria","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"311094967","grupo":"mapa","color":"#1565C0","ecolor":"#2E7D32","foto":"DANIEL_ENRIQUE_VILLALPANDO_CHAVEZ.jpeg"},
+  {"id":3,"uid":"3","nombre":"INES HERRERA GARCÍA","lugar":"04","area":"CCOPS","nomina":"Ordinaria","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"311095381","grupo":"mapa","color":"#1565C0","ecolor":"#2E7D32","foto":"INES_HERRERA_GARCIA.jpeg"},
+  {"id":4,"uid":"4","nombre":"SUEMI MYRIAM VELAZQUEZ TORRES","lugar":"03","area":"CCOPS","nomina":"Ordinaria","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"311093070","grupo":"mapa","color":"#1565C0","ecolor":"#2E7D32","foto":"SUEMI_MYRIAM_VELAZQUEZ_TORRES.png"},
+  {"id":5,"uid":"5","nombre":"CLAUDIA LORENA TOSCANO CHÁVEZ","lugar":"02","area":"CCOPS","nomina":"Ordinaria","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"","grupo":"mapa","color":"#1565C0","ecolor":"#2E7D32","foto":"CLAUDIA_LORENA_TOSCANO_CHAVEZ.jpeg"},
+  {"id":6,"uid":"6","nombre":"NALLELY IRENE CABALLERO GUZMAN","lugar":"05","area":"CCOPS","nomina":"Ordinaria","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"","grupo":"mapa","color":"#1565C0","ecolor":"#2E7D32","foto":"NALLELY_IRENE_CABALLERO_GUZMAN.jpeg"},
+  {"id":7,"uid":"7","nombre":"LUCÍA ILEANA VILLALÓN TRUJILLO","lugar":"07","area":"DPC","nomina":"Mando","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"LUCIA_ILEANA_VILLALON_TRUJILLO.png"},
+  {"id":8,"uid":"9","nombre":"HUMBERTO LEON PALOMINO","lugar":"31","area":"DSAA","nomina":"Mando","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"HUMBERTO_LEON_PALOMINO.jpeg"},
+  {"id":9,"uid":"10","nombre":"FERNANDO MENDOZA ELVIRA","lugar":"50","area":"DNAJ","nomina":"Mando","estatus":"Activo","adscripcion":"ccops","categoria":"","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#2E7D32","foto":"FERNANDO_MENDOZA_ELVIRA.jpeg"},
+  {"id":10,"uid":"52","nombre":"TERESA VALENCIA FLORES","lugar":"05","area":"CCOPS","nomina":"Ordinaria","estatus":"Nuevo ingreso 1er bloque","adscripcion":"ccops","categoria":"Analista E1","matricula":"","grupo":"mapa","color":"#1565C0","ecolor":"#1565C0","foto":"TERESA_FLORES_VALENCIA.jpeg"},
+  {"id":11,"uid":"48","nombre":"ANA MARIA GARDUÑO GARCIA","lugar":"51","area":"DNAJ","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#2E7D32","foto":"ANA_MARIA_GARDUNO_GARCIA.jpeg"},
+  {"id":12,"uid":"49","nombre":"BRISA CELESTE MARQUEZ GONZALEZ","lugar":"53","area":"DNAJ","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#2E7D32","foto":"BRISA_CELESTE_MARQUEZ_GONZALEZ.jpeg"},
+  {"id":13,"uid":"50","nombre":"MARIO RAMIREZ ALVARADO","lugar":"52","area":"DNAJ","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#2E7D32","foto":"MARIO_RAMIREZ_ALVARADO.jpeg"},
+  {"id":14,"uid":"64","nombre":"YENIFER STHEPHANIE MARTINEZ RIVERA","lugar":"Sala de juntas","area":"DNAJ","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"Supervisor de Proyectos E1","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#F57F17","foto":"YENIFER_STHEPHANIE_MARTINEZ_RIVERA.jpeg"},
+  {"id":15,"uid":"65","nombre":"OSCAR VILLANUEVA OLIVARES","lugar":"51","area":"DNAJ","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"Supervisor de Proyectos E1","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#F57F17","foto":"OSCAR_VILLANUEVA_OLIVARES.jpeg"},
+  {"id":16,"uid":"66","nombre":"CARLOS ALBERTO ROJAS HEREDIA","lugar":"Sala de juntas","area":"DNAJ","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"Analista E1","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#F57F17","foto":"CARLOS_ALBERTO_ROJAS_HEREDIA.jpeg"},
+  {"id":17,"uid":"75","nombre":"VICENTA MIRYAM ROMAN NAVARRETE","lugar":"Sala de juntas","area":"DNAJ","nomina":"Ordinaria","estatus":"Nuevo ingreso 3er bloque","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"Supervisor de Proyectos E1","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#BF360C","foto":"VICENTA_MIRYAM_ROMAN_NAVARRETE.jpeg"},
+  {"id":18,"uid":"84","nombre":"EDGAR ALEJANDRO PÉREZ LUNA","lugar":"Sala de juntas","area":"DNAJ","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"Jefe de Área NC E0","matricula":"","grupo":"mapa","color":"#6A1B9A","ecolor":"#757575","foto":"EDGAR_ALEJANDRO_PEREZ_LUNA.jpeg"},
+  {"id":19,"uid":"85","nombre":"GUSTAVO JIMÉNEZ MAYÉN","lugar":"Sala de juntas","area":"DNAJ","nomina":"Ordinaria","estatus":"Pendiente","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"Supervisor de Proyectos E1","matricula":"","grupo":"pendiente","color":"#6A1B9A","ecolor":"#757575"},
+  {"id":20,"uid":"86","nombre":"IVÁN RODRIGO OLLIVIER RIVERA","lugar":"Sala de juntas","area":"DNAJ","nomina":"Ordinaria","estatus":"Pendiente","adscripcion":"División de Normatividad y Asesoría Jurídica","categoria":"Supervisor de Proyectos E1","matricula":"","grupo":"pendiente","color":"#6A1B9A","ecolor":"#757575"},
+  {"id":21,"uid":"8","nombre":"JOSÉ ALFONSO GARFIAS CORONA","lugar":"09","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Procesos de Contratación","categoria":"","matricula":"311092593","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"JOSE_ALFONSO_GARFIAS_CORONA.jpeg"},
+  {"id":22,"uid":"11","nombre":"ALEJANDRO TONATIUH GUZMAN MEDELLIN","lugar":"10","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Procesos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"ALEJANDRO_TONATIUH_GUZMAN_MEDELLIN.jpeg"},
+  {"id":23,"uid":"12","nombre":"LUIS DAVID ROMAN RUIZ","lugar":"08","area":"DPC","nomina":"Mando","estatus":"Activo","adscripcion":"División de Procesos de Contratación","categoria":"","matricula":"311095748","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"LUIS_DAVID_ROMAN_RUIZ.jpeg"},
+  {"id":24,"uid":"16","nombre":"IVONNE ENRIQUETA REYES CARDENAS","lugar":"11","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Procesos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"IVONNE_ENRIQUETA_REYES_CARDENAS.png"},
+  {"id":25,"uid":"21","nombre":"MARTHA SUSANA HERNANDEZ RANGEL","lugar":"21","area":"DPC","nomina":"Mando","estatus":"Activo","adscripcion":"División de Procesos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"MARTHA_SUSANA_HERNANDEZ_RANGEL.jpeg"},
+  {"id":26,"uid":"60","nombre":"ADRIAN PICHARDO LEYTE","lugar":"09","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"División de Procesos de Contratación","categoria":"Analista E2","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#F57F17","foto":"ADRIAN_PICHARDO_LEYTE.jpeg"},
+  {"id":27,"uid":"68","nombre":"VICTOR MANUEL SANCHEZ TAFOYA","lugar":"Sala de juntas","area":"CCOPS","nomina":"Ordinaria","estatus":"Nuevo ingreso 3er bloque","adscripcion":"División de Procesos de Contratación","categoria":"Analista E2","matricula":"","grupo":"mapa","color":"#1565C0","ecolor":"#BF360C","foto":"VICTOR_MANUEL_SANCHEZ_TAFOYA.jpeg"},
+  {"id":28,"uid":"71","nombre":"RAUL ALAMEDA DE LA MORA","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 3er bloque","adscripcion":"División de Procesos de Contratación","categoria":"Analista E3","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#BF360C","foto":"RAUL_ALAMEDA_DE_LA_MORA.png"},
+  {"id":29,"uid":"76","nombre":"MARIO EMILIO SIGUIENZA CAMACHO","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"División de Procesos de Contratación","categoria":"Jefe de Área NC E0","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#757575","foto":"MARIO_EMILIO_SIGUENZA_CAMACHO.png"},
+  {"id":30,"uid":"79","nombre":"MARÍA KARINA SÁNCHEZ TORRES","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"División de Procesos de Contratación","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#757575","foto":"MARIA_KARINA_SANCHEZ_TORRES.jpeg"},
+  {"id":31,"uid":"82","nombre":"NOHEMI RUIZ ANGELES","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"División de Procesos de Contratación","categoria":"Analista E2","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#757575","foto":"NOHEMI_RUIZ_ANGELES.png"},
+  {"id":32,"uid":"87","nombre":"DIANA LAURA HERNÁNDEZ SANTAMARIA","lugar":"Sala de juntas","area":"DNAJ","nomina":"Ordinaria","estatus":"Pendiente","adscripcion":"División de Procesos de Contratación","categoria":"Analista E1","matricula":"","grupo":"pendiente","color":"#6A1B9A","ecolor":"#757575"},
+  {"id":33,"uid":"29","nombre":"DIANA RAQUEL OLIVARES CARMONA","lugar":"33","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"DIANA_RAQUEL_OLIVARES_CARMONA.jpg"},
+  {"id":34,"uid":"30","nombre":"ALEJANDRO FONG SURIANO","lugar":"34","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"ALEJANDRO_FONG_SURIANO.png"},
+  {"id":35,"uid":"31","nombre":"CHRISTIAN PALOMINO GARCIA","lugar":"32","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"CHRISTIAN_PALOMINO_GARCIA.jpeg"},
+  {"id":36,"uid":"32","nombre":"FERNANDO MENDOZA AQUINO","lugar":"35","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"FERNANDO_MENDOZA_AQUINO.jpeg"},
+  {"id":37,"uid":"35","nombre":"JOSE REGULO LOPEZ ACEVES","lugar":"36","area":"DSAA","nomina":"Mando","estatus":"Activo","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"JOSE_REGULO_LOPEZ_ACEVES.jpeg"},
+  {"id":38,"uid":"40","nombre":"JOSE LUIS DIAZ LARA","lugar":"43","area":"DSAA","nomina":"Mando","estatus":"Activo","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"JOSE_LUIS_DIAZ_LARA.jpeg"},
+  {"id":39,"uid":"58","nombre":"MIGUEL ANGEL GONZÁLEZ BAUTISTA","lugar":"Sala de juntas","area":"DSAA","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"Jefe de Área NC E0","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#F57F17","foto":"MIGUEL_ANGEL_GONZALEZ_BAUTISTA.png"},
+  {"id":40,"uid":"59","nombre":"VANESSA PAULINA DE SANJUAN GONZÁLEZ","lugar":"32","area":"DSAA","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"Analista E2","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#F57F17","foto":"VANESSA_PAULINA_DE_SANJUAN_GONZALEZ.png"},
+  {"id":41,"uid":"67","nombre":"PEDRO YAIR GOMEZ RIVERA","lugar":"Sala de juntas","area":"DSAA","nomina":"Ordinaria","estatus":"Nuevo ingreso 3er bloque","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"Analista E1","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#BF360C","foto":"PEDRO_YAIR_GOMEZ_RIVERA.jpeg"},
+  {"id":42,"uid":"83","nombre":"MIGUEL ANGEL MONTOYA CHÁVEZ","lugar":"Sala de juntas","area":"DSAA","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"Jefe de Área NC E0","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#757575","foto":"MIGUEL_ANGEL_MONTOYA_CHAVEZ.jpeg"},
+  {"id":43,"uid":"91","nombre":"AMISADAI PAMELA CABALLERO LÓPEZ","lugar":"Sala de juntas","area":"DSAA","nomina":"Ordinaria","estatus":"Pendiente","adscripcion":"División de Seguimiento y Atención a Auditorias","categoria":"Analista E1","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#757575","foto":"AMISADAI_PAMELA_CABALLERO_LOPEZ.jpeg"},
+  {"id":44,"uid":"22","nombre":"KARLA VAZQUEZ DEL ANGEL","lugar":"24","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"KARLA_VAZQUEZ_DEL_ANGEL.png"},
+  {"id":45,"uid":"24","nombre":"ENRIQUE JOEL BALTAZARES LUNA","lugar":"26","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"ENRIQUE_JOEL_BALTAZARES_LUNA.jpeg"},
+  {"id":46,"uid":"25","nombre":"KARLA GABRIELA ISLAS ALONSO","lugar":"27","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"KARLA_GABRIELA_ISLAS_ALONSO.png"},
+  {"id":47,"uid":"26","nombre":"ARACELI GARCIA GARCIA","lugar":"22","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"ARACELI_GARCIA_GARCIA.jpeg"},
+  {"id":48,"uid":"27","nombre":"LORENA RODRIGUEZ PANTOJA","lugar":"30","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"LORENA_RODRIGUEZ_PANTOJA.png"},
+  {"id":49,"uid":"28","nombre":"ZAIRA LILIANA JIMENEZ SEADE","lugar":"23","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"ZAIRA_LILIANA_JIMENEZ_SEADE.png"},
+  {"id":50,"uid":"55","nombre":"ESTEFANIA MONSERRAT RAMÍREZ SABIDO","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 1er bloque","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"Analista E2","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#1565C0","foto":"ESTEFANIA_MONSERRAT_RAMIREZ_SABIDO.jpeg"},
+  {"id":51,"uid":"56","nombre":"AIDEÉ SUSANA GARCÍA AGUILAR","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 1er bloque","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#1565C0","foto":"AIDEE_SUSANA_GARCIA_AGUILAR.png"},
+  {"id":52,"uid":"57","nombre":"RUBÉN ISRAEL MARTÍNEZ MEDINA","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 1er bloque","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#1565C0","foto":"RUBEN_ISRAEL_MARTINEZ_MEDINA.jpeg"},
+  {"id":53,"uid":"63","nombre":"CLAUDIA PAVÓN GÓMEZ","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#F57F17","foto":"CLAUDIA_PAVON_GOMEZ.jpeg"},
+  {"id":54,"uid":"70","nombre":"NAXHIELI BERENICE VALERIO LOPEZ","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 3er bloque","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"Analista E2","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#BF360C","foto":"NAXHIELI_BERENICE_VALERIO_LOPEZ.jpeg"},
+  {"id":55,"uid":"77","nombre":"LESLIE ROMERO BARRIGA","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"Subjefatura de División de Contratos y Convenios","categoria":"Supervisor de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#757575","foto":"LESLIE_GUADALUPE_ROMERO_BARRIGA.jpeg"},
+  {"id":56,"uid":"33","nombre":"RICARDO ISRAEL QUINTANAR CARRILLO","lugar":"41","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"RICARDO_ISRAEL_QUINTANAR_CARRILLO.jpeg"},
+  {"id":57,"uid":"34","nombre":"GUILLERMINA JUAREZ CONTRERAS","lugar":"25","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"GUILLERMINA_JUAREZ_CONTRERAS.png"},
+  {"id":58,"uid":"36","nombre":"BLANCA ESTELA GARCIA MACIAS","lugar":"37","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"BLANCA_ESTELA_GARCIA_MACIAS.png"},
+  {"id":59,"uid":"37","nombre":"MARCO EMMANUEL MEDINA AMADOR","lugar":"39","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"MARCO_EMMANUEL_MEDINA_AMADOR.jpeg"},
+  {"id":60,"uid":"38","nombre":"EDGAR CAMACHO ACOSTA","lugar":"40","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"EDGAR_CAMACHO_ACOSTA.jpeg"},
+  {"id":61,"uid":"39","nombre":"GEORGINA DE LA PAZ PANTOJA","lugar":"42","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"GEORGINA_DE_LA_PAZ_PANTOJA.jpeg"},
+  {"id":62,"uid":"41","nombre":"KEVIN RUBEN MARQUEZ GONZALEZ","lugar":"44","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"KEVIN_RUBEN_MARQUEZ_GONZALEZ.jpeg"},
+  {"id":63,"uid":"73","nombre":"ROSENDO RENÉ REBOLLEDO MARQUEZ","lugar":"Sala de juntas","area":"DSAA","nomina":"Ordinaria","estatus":"Nuevo ingreso 3er bloque","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#BF360C","foto":"ROSENDO_RENE_REBOLLEDO_MARQUEZ.jpeg"},
+  {"id":64,"uid":"89","nombre":"XOCHITL SALGADO FLORES","lugar":"Sala de juntas","area":"DSAA","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores","categoria":"Analista E3","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#757575","foto":"XOCHITL_SALGADO_FLORES.jpeg"},
+  {"id":65,"uid":"13","nombre":"SAUL GONZALEZ MARTINEZ","lugar":"13","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"311094839","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"SAUL_GONZALEZ_MARTINEZ.jpeg"},
+  {"id":66,"uid":"14","nombre":"SANTANA ALFONSO VALDES BADILLO","lugar":"17","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"311094840","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"SANTANA_ALFONSO_VALDES_BADILLO.jpeg"},
+  {"id":67,"uid":"15","nombre":"TANIA ESTEFANIA GUTIERREZ CASTRUITA","lugar":"18","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"311091292","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"TANIA_ESTEFANIA_GUTIERREZ_CASTRUITA.jpg"},
+  {"id":68,"uid":"17","nombre":"ALICIA CAMPOS CABALLERO","lugar":"16","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"ALICIA_CAMPOS_CABALLERO.png"},
+  {"id":69,"uid":"18","nombre":"ERIK ALFREDO GAONA REYES","lugar":"14","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"ERIK_ALFREDO_GAONA_REYES.jpeg"},
+  {"id":70,"uid":"19","nombre":"RAFAEL PEREZ FIGUEROA","lugar":"15","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"RAFAEL_PEREZ_FIGUEROA.jpeg"},
+  {"id":71,"uid":"20","nombre":"ALEJANDRO MORALES MADRIGAL","lugar":"19","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"ALEJANDRO_MORALES_MADRIGAL.png"},
+  {"id":72,"uid":"23","nombre":"CINTHYA MILER SALINAS","lugar":"20","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"CINTHYA_MILER_SALINAS.jpeg"},
+  {"id":73,"uid":"51","nombre":"JOSE RAMON RAMIREZ GOROSTIZA","lugar":"28","area":"DPC","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32","foto":"JOSE_RAMON_RAMIREZ_GOROSTIZA.png"},
+  {"id":74,"uid":"53","nombre":"ROBERTO RICARDEZ MENDOZA","lugar":"46","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 1er bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#1565C0","foto":"ROBERTO_RICARDEZ_MENDOZA.jpeg"},
+  {"id":75,"uid":"54","nombre":"RUEL ALEJANDRO LEYVA PAREDES","lugar":"38","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 1er bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#1565C0","foto":"RUEL_ALEJANDRO_LEYVA_PAREDES.jpeg"},
+  {"id":76,"uid":"61","nombre":"MAYRA LUZ AMBROCIO MÉNDEZ","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#F57F17","foto":"MAYRA_LUZ_AMBROCIO_MENDEZ.png"},
+  {"id":77,"uid":"62","nombre":"GUILLERMO MANRIQUE FERNANDEZ","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 2ndo bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#F57F17","foto":"GUILLERMO_MANRIQUE_FERNANDEZ.png"},
+  {"id":78,"uid":"69","nombre":"MARIANA CRUZ FRAGOSO","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 3er bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Analista E2","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#BF360C","foto":"MARIANA_CRUZ_FRAGOSO.jpeg"},
+  {"id":79,"uid":"72","nombre":"JESSICA MAQUEDA RAMOS","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 3er bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#BF360C","foto":"JESSICA_MAQUEDA_RAMOS.jpeg"},
+  {"id":80,"uid":"74","nombre":"MARCOS RODRIGO MALDONADO LOPEZ","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Coord. de Proyectos E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#757575","foto":"MARCOS_RODRIGO_MALDONADO_LOPEZ.jpeg"},
+  {"id":81,"uid":"80","nombre":"BERENICE ALEJANDRA GARCÍA OROZCO","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Analista E2","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#757575","foto":"BERENICE_ALEJANDRA_GARCIA_OROZCO.jpeg"},
+  {"id":82,"uid":"88","nombre":"VERÓNICA NOEMI NOGUERÓN SAN MIGUEL","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Pendiente","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Analista E1","matricula":"","grupo":"pendiente","color":"#E65100","ecolor":"#757575"},
+  {"id":83,"uid":"90","nombre":"ALEXA NAIAN PALENCIA FERNÁNDEZ","lugar":"Sala de juntas","area":"DPC","nomina":"Ordinaria","estatus":"Nuevo ingreso 4to bloque","adscripcion":"Subjefatura de División de Procedimientos de Contratación","categoria":"Analista E1","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#757575","foto":"ALEXA_NAIAN_PALENCIA_FERNANDEZ.jpeg"},
+  {"id":84,"uid":"42","nombre":"LILIANA ELIZABETH RAMOS ROLDAN","lugar":"45","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Transparencia y Certificación","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"LILIANA_ELIZABETH_RAMOS_ROLDAN.jpeg"},
+  {"id":85,"uid":"43","nombre":"JOSE ARMANDO ZAMUDIO CAMARILLO","lugar":"chofer","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Transparencia y Certificación","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"JOSE_ARMANDO_ZAMUDIO_CAMARILLO.jpeg"},
+  {"id":86,"uid":"44","nombre":"ALFONSO ALVARADO RAYA","lugar":"47","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Transparencia y Certificación","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"ALFONSO_ALVARADO_RAYA.jpeg"},
+  {"id":87,"uid":"45","nombre":"JULIETA DEL CONSUELO ROJAS PEÑA","lugar":"48","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Transparencia y Certificación","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"JULIETA_DEL_CONSUELO_ROJAS_PENA.jpeg"},
+  {"id":88,"uid":"46","nombre":"JUAN PEDRO ESPINOZA CASTELLANOS","lugar":"49","area":"DSAA","nomina":"Ordinaria","estatus":"Activo","adscripcion":"Subjefatura de División de Transparencia y Certificación","categoria":"","matricula":"","grupo":"mapa","color":"#2E7D32","ecolor":"#2E7D32","foto":"JUAN_PEDRO_ESPINOSA_CASTELLANOS.jpeg"},
+  {"id":89,"uid":"92","nombre":"JULIO CÉSAR TELLEZ GUERRERO","lugar":"16","area":"CCOPS","nomina":"-","estatus":"Servicio Social","adscripcion":"ccops","categoria":"Servicio Social","matricula":"","grupo":"mapa","color":"#E65100","ecolor":"#2E7D32"},
+  {"id":90,"uid":"93","nombre":"JULIA ANAHI MIRANDA ESPINOSA","lugar":"04","area":"CCOPS","nomina":"-","estatus":"Servicio Social","adscripcion":"ccops","categoria":"Servicio Social","matricula":"","grupo":"mapa","color":"#1565C0","ecolor":"#1565C0"}
 ]; // ← pega aquí tu array de objetos sin x/y
+
+// ─────────────────────────────────────────────
+//  JERARQUÍA — organigrama CCOPS
+//  Se calcula a partir de "area" + "adscripcion" +
+//  los uids de los mandos, ya presentes en personalBase.
+// ─────────────────────────────────────────────
+const JEFES = {
+  CESAR: '1',        // Titular CCOPS
+  LUCIA: '7',         // Jefa DPC
+  HUMBERTO: '9',       // Jefe DSAA
+  FERNANDO: '10',      // Jefe DNAJ
+  LUISDAVID: '12',     // Titular Subjefatura Procedimientos de Contratación (bajo Lucía)
+  MARTHA: '21',        // Titular Subjefatura Contratos y Convenios (bajo Lucía)
+  JOSEREGULO: '35',    // Titular Subjefatura Atención a Órganos Fiscalizadores (bajo Humberto)
+  JOSELUIS: '40'       // Titular Subjefatura Transparencia y Certificación (bajo Humberto)
+};
+
+function getJefeUid(d) {
+  if (d.uid === JEFES.CESAR) return null; // raíz del organigrama
+  if (d.area === 'DPC') {
+    if (d.uid === JEFES.LUCIA) return JEFES.CESAR;
+    if (d.uid === JEFES.LUISDAVID) return JEFES.LUCIA;
+    if (d.uid === JEFES.MARTHA) return JEFES.LUCIA;
+    if (d.adscripcion === 'Subjefatura de División de Procedimientos de Contratación') return JEFES.LUISDAVID;
+    if (d.adscripcion === 'Subjefatura de División de Contratos y Convenios') return JEFES.MARTHA;
+    return JEFES.LUCIA; // personal directo de la división
+  }
+  if (d.area === 'DSAA') {
+    if (d.uid === JEFES.HUMBERTO) return JEFES.CESAR;
+    if (d.uid === JEFES.JOSEREGULO) return JEFES.HUMBERTO;
+    if (d.uid === JEFES.JOSELUIS) return JEFES.HUMBERTO;
+    if (d.adscripcion === 'Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores') return JEFES.JOSEREGULO;
+    if (d.adscripcion === 'Subjefatura de División de Transparencia y Certificación') return JEFES.JOSELUIS;
+    return JEFES.HUMBERTO;
+  }
+  if (d.area === 'DNAJ') {
+    if (d.uid === JEFES.FERNANDO) return JEFES.CESAR;
+    return JEFES.FERNANDO;
+  }
+  // CCOPS (incluye préstamo, servicio social y adscripción "ccops")
+  return JEFES.CESAR;
+}
+
+// Calcula orgX/orgY (%) para cada elemento, con un layout tipo árbol
+function buildOrgLayout(list) {
+  const children = {};
+  list.forEach(d => {
+    d.orgJefeUid = getJefeUid(d);
+    if (d.orgJefeUid) (children[d.orgJefeUid] = children[d.orgJefeUid] || []).push(d);
+  });
+  Object.values(children).forEach(arr => arr.sort((a, b) => {
+    const am = a.nomina === 'Mando' ? 0 : 1, bm = b.nomina === 'Mando' ? 0 : 1;
+    return am - bm || a.nombre.localeCompare(b.nombre);
+  }));
+
+  const root = list.find(d => d.orgJefeUid === null);
+  if (!root) return;
+
+  function countLeaves(node) {
+    const kids = children[node.uid] || [];
+    node._leaves = kids.length ? kids.reduce((s, k) => s + countLeaves(k), 0) : 1;
+    return node._leaves;
+  }
+  countLeaves(root);
+
+  const MAX_DEPTH = 3; // raíz(0) → mandos(1) → división/subjefatura(2) → staff(3)
+  function assign(node, depth, xStart, xEnd) {
+    node.orgY = 8 + depth * (84 / MAX_DEPTH);
+    node.orgX = (xStart + xEnd) / 2;
+    const kids = children[node.uid] || [];
+    let cursor = xStart;
+    kids.forEach(k => {
+      const width = (k._leaves / node._leaves) * (xEnd - xStart);
+      assign(k, depth + 1, cursor, cursor + width);
+      cursor += width;
+    });
+  }
+  assign(root, 0, 2, 98);
+}
 
 // ─────────────────────────────────────────────
 //  ESTADO GLOBAL
 // ─────────────────────────────────────────────
 let devices = [];
 let currentLayout = null; // 'horizontal' | 'vertical'
-let locateMode = false, activeId = null, pendOpen = false, toastTimer;
+let locateMode = false, orgMode = false, activeId = null, pendOpen = false, toastTimer;
 
 // Referencias DOM
 const layer    = document.getElementById('pins-layer');
+const linesLayer = document.getElementById('org-lines');
 const img      = document.getElementById('floor-img');
 const mapWrap  = document.getElementById('map-wrap');
 const mapCont  = document.getElementById('map-container');
@@ -1714,15 +454,15 @@ const toast    = document.getElementById('toast');
 const overlay  = document.getElementById('loading-overlay');
 const layoutInd = document.getElementById('layout-indicator');
 const layoutLbl = document.getElementById('layout-label');
+const modeBtn  = document.getElementById('mode-btn');
+const orgBtn   = document.getElementById('orgchart-btn');
 
 // ─────────────────────────────────────────────
 //  DETECCIÓN DE LAYOUT
 // ─────────────────────────────────────────────
 function detectLayout() {
-  // Usa screen.orientation cuando esté disponible (más fiable en móvil)
-  // y cae a window.innerWidth como fallback
   if (window.screen && window.screen.orientation) {
-    const type = window.screen.orientation.type; // 'landscape-primary', 'portrait-primary', etc.
+    const type = window.screen.orientation.type;
     return type.startsWith('portrait') ? 'vertical' : 'horizontal';
   }
   return window.innerWidth <= CONFIG.mobileBreakpoint ? 'vertical' : 'horizontal';
@@ -1732,14 +472,13 @@ function detectLayout() {
 //  CARGA DE RECURSOS (imagen + coords JSON)
 // ─────────────────────────────────────────────
 async function loadLayout(layout) {
-  if (layout === currentLayout) return; // nada cambió
+  if (layout === currentLayout) return;
   currentLayout = layout;
 
   showLoading(true);
   panel.style.display = 'none';
 
   try {
-    // Carga paralela: imagen y JSON de coordenadas
     const [coordsData] = await Promise.all([
       fetch(CONFIG.coords[layout]).then(r => {
         if (!r.ok) throw new Error(`No se pudo cargar ${CONFIG.coords[layout]}`);
@@ -1752,7 +491,6 @@ async function loadLayout(layout) {
       })
     ]);
 
-    // Mezcla: datos base del personal + coordenadas del JSON externo
     const coordsMap = {};
     coordsData.forEach(c => { coordsMap[c.id] = { x: c.x, y: c.y }; });
 
@@ -1762,7 +500,8 @@ async function loadLayout(layout) {
       y: coordsMap[d.id]?.y ?? d.y ?? 50
     }));
 
-    // Actualiza indicador de modo
+    buildOrgLayout(devices);
+
     layoutInd.className = 'layout-indicator ' + layout;
     layoutLbl.textContent = layout === 'horizontal' ? '🖥 PC' : '📱 Móvil';
 
@@ -1785,7 +524,6 @@ function showLoading(visible) {
 let resizeTimer;
 function onLayoutChange() {
   clearTimeout(resizeTimer);
-  // Pequeño debounce para evitar cargas múltiples durante el resize
   resizeTimer = setTimeout(() => {
     const newLayout = detectLayout();
     if (newLayout !== currentLayout) {
@@ -1794,12 +532,20 @@ function onLayoutChange() {
   }, 200);
 }
 
-// screen.orientation es el evento más preciso en móvil
 if (window.screen?.orientation) {
   window.screen.orientation.addEventListener('change', onLayoutChange);
 }
-// window resize como fallback (PC al redimensionar la ventana)
 window.addEventListener('resize', onLayoutChange);
+
+// ─────────────────────────────────────────────
+//  DIRECCIÓN DEL TOOLTIP (según posición del pin)
+// ─────────────────────────────────────────────
+function updateTooltipDir(pin, x, y) {
+  pin.classList.remove('tooltip-below', 'tooltip-left', 'tooltip-right');
+  if (y < 25) pin.classList.add('tooltip-below');
+  if (x < 15) pin.classList.add('tooltip-left');
+  if (x > 85) pin.classList.add('tooltip-right');
+}
 
 // ─────────────────────────────────────────────
 //  INICIALIZACIÓN DE PINS
@@ -1809,7 +555,8 @@ function initPins() {
   devices.filter(d => d.grupo === 'mapa').forEach(d => {
     const pin = document.createElement('div');
     pin.className = 'pin'; pin.dataset.id = d.id; pin.dataset.area = d.area;
-    pin.style.left = d.x + '%'; pin.style.top = d.y + '%';
+    const px = orgMode ? d.orgX : d.x, py = orgMode ? d.orgY : d.y;
+    pin.style.left = px + '%'; pin.style.top = py + '%';
     const c = document.createElement('div');
     c.className = 'pin-circle'; c.style.background = d.color;
     const p = d.nombre.trim().split(' ');
@@ -1824,20 +571,62 @@ function initPins() {
     } else {
       tt.innerHTML = `<div class="pin-tooltip-noimg">${d.nombre}</div>`;
     }
-    pin.appendChild(tt); // Suguerencia de Claude para mostrar fotos
+    pin.appendChild(tt);
     pin.addEventListener('click', e => { if (!locateMode) { e.stopPropagation(); showPanel(d.id); } });
     makeDraggable(pin, d);
     layer.appendChild(pin);
-    // Ajuste de posición del tooltip según ubicación del pin
-    (function ajustarTooltip() {
-      const y = parseFloat(pin.style.top);
-      const x = parseFloat(pin.style.left);
-      if (y < 25) pin.classList.add('tooltip-below');
-      if (x < 15) pin.classList.add('tooltip-left');
-      if (x > 85) pin.classList.add('tooltip-right');
-    })();
+    updateTooltipDir(pin, px, py);
   });
   buildPendientesPanel(); updateCounts(); applyFilters();
+  if (orgMode) drawOrgLines();
+}
+
+// ─────────────────────────────────────────────
+//  TOGGLE ORGANIGRAMA
+// ─────────────────────────────────────────────
+orgBtn.addEventListener('click', () => {
+  if (locateMode) modeBtn.click(); // salir de modo ubicar si estaba activo
+  orgMode = !orgMode;
+  orgBtn.classList.toggle('active', orgMode);
+  panel.style.display = 'none';
+
+  const pins = document.querySelectorAll('.pin');
+  pins.forEach(p => p.classList.add('org-anim'));
+  img.classList.toggle('faded', orgMode);
+
+  if (orgMode) {
+    linesLayer.innerHTML = '';
+    pins.forEach(pin => {
+      const d = devices.find(x => x.id === +pin.dataset.id);
+      if (!d) return;
+      pin.style.left = d.orgX + '%'; pin.style.top = d.orgY + '%';
+      updateTooltipDir(pin, d.orgX, d.orgY);
+    });
+    setTimeout(drawOrgLines, 680);
+  } else {
+    linesLayer.style.opacity = '0';
+    setTimeout(() => { linesLayer.innerHTML = ''; linesLayer.style.opacity = '1'; }, 350);
+    pins.forEach(pin => {
+      const d = devices.find(x => x.id === +pin.dataset.id);
+      if (!d) return;
+      pin.style.left = d.x + '%'; pin.style.top = d.y + '%';
+      updateTooltipDir(pin, d.x, d.y);
+    });
+  }
+  setTimeout(() => pins.forEach(p => p.classList.remove('org-anim')), 900);
+});
+
+function drawOrgLines() {
+  linesLayer.innerHTML = '';
+  devices.filter(d => d.grupo === 'mapa' && d.orgJefeUid).forEach(d => {
+    const jefe = devices.find(x => x.uid === d.orgJefeUid && x.grupo === 'mapa');
+    if (!jefe) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', jefe.orgX); line.setAttribute('y1', jefe.orgY);
+    line.setAttribute('x2', d.orgX);    line.setAttribute('y2', d.orgY);
+    line.setAttribute('class', 'org-line');
+    linesLayer.appendChild(line);
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -1879,7 +668,7 @@ function showPanelData(d) {
     rows.appendChild(r);
   });
   const cr = document.getElementById('coords-row'), hint = document.getElementById('edit-hint');
-  if (d.grupo === 'pendiente') { cr.style.display = 'none'; hint.style.display = 'none'; }
+  if (d.grupo === 'pendiente' || orgMode) { cr.style.display = 'none'; hint.style.display = 'none'; }
   else { cr.style.display = 'flex'; hint.style.display = 'block'; updatePanelCoords(d); }
   panel.classList.toggle('shift', pendOpen);
   panel.style.display = 'block';
@@ -1901,12 +690,12 @@ document.getElementById('pendientes-btn').addEventListener('click', () => {
 });
 
 // ─────────────────────────────────────────────
-//  DRAG (sin cambios respecto al original)
+//  DRAG (deshabilitado en modo organigrama)
 // ─────────────────────────────────────────────
 function makeDraggable(pin, d) {
   let dragging = false, startX, startY;
   pin.addEventListener('mousedown', e => {
-    if (locateMode) return; e.preventDefault(); dragging = false; startX = e.clientX; startY = e.clientY;
+    if (locateMode || orgMode) return; e.preventDefault(); dragging = false; startX = e.clientX; startY = e.clientY;
     const onMove = mv => {
       if (!dragging && Math.hypot(mv.clientX - startX, mv.clientY - startY) > 4) { dragging = true; pin.classList.add('drag-active'); }
       if (!dragging) return;
@@ -1914,6 +703,7 @@ function makeDraggable(pin, d) {
       d.x = Math.min(100, Math.max(0, ((mv.clientX - rect.left) / rect.width) * 100));
       d.y = Math.min(100, Math.max(0, ((mv.clientY - rect.top) / rect.height) * 100));
       pin.style.left = d.x + '%'; pin.style.top = d.y + '%';
+      updateTooltipDir(pin, d.x, d.y);
       if (activeId === d.id) updatePanelCoords(d);
     };
     const onUp = () => {
@@ -1929,8 +719,8 @@ function makeDraggable(pin, d) {
 // ─────────────────────────────────────────────
 //  MODO UBICAR
 // ─────────────────────────────────────────────
-const modeBtn = document.getElementById('mode-btn');
 modeBtn.addEventListener('click', () => {
+  if (orgMode) return; // no permitido en modo organigrama
   locateMode = !locateMode; modeBtn.classList.toggle('active', locateMode);
   mapCont.classList.toggle('locate-mode', locateMode);
   showToast(locateMode ? 'Modo ubicar activo — clic en el plano' : 'Modo ubicar desactivado');
