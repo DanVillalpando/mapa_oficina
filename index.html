@@ -26,9 +26,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 .fb-dnaj.active{color:#6A1B9A;border-color:#6A1B9A;background:#F3E5F5}
 #mode-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #1565C0;color:#1565C0;background:#fff;cursor:pointer;font-weight:600;transition:all .15s}
 #mode-btn.active{background:#1565C0;color:#fff}
-#orgchart-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #37474F;color:#37474F;background:#fff;cursor:pointer;font-weight:600;transition:all .15s}
-#orgchart-btn.active{background:#37474F;color:#fff}
-#orgchart-btn:disabled{opacity:.4;cursor:not-allowed}
 #export-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #888;color:#555;background:#fff;cursor:pointer}
 #pendientes-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #757575;color:#555;background:#fff;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:5px;transition:all .15s;margin-left:auto}
 #pendientes-btn.active{background:#757575;color:#fff}
@@ -52,14 +49,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 #map-container.locate-mode{cursor:crosshair}
 #map-container:active:not(.locate-mode){cursor:grabbing}
 #map-wrap{position:relative;width:100%;height:100%}
-#floor-img{display:block;width:100%;height:100%;object-fit:contain;transition:opacity .5s ease}
-#floor-img.faded{opacity:0}
+#floor-img{display:block;width:100%;height:100%;object-fit:contain}
 #pins-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
-#org-lines{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:1;transition:opacity .35s ease}
-.org-line{stroke:#90A4AE;stroke-width:.28;fill:none;opacity:0;animation:lineFadeIn .5s ease forwards}
-@keyframes lineFadeIn{to{opacity:.85}}
 .pin{position:absolute;transform:translate(-50%,-50%);pointer-events:all;cursor:pointer;z-index:10}
-.pin.org-anim{transition:left .75s cubic-bezier(.4,0,.2,1), top .75s cubic-bezier(.4,0,.2,1)}
 .pin-circle{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff;transition:transform .12s,box-shadow .12s;box-shadow:0 1px 5px rgba(0,0,0,0.3);letter-spacing:-.3px;user-select:none}
 .pin:hover .pin-circle{transform:scale(1.5);box-shadow:0 3px 12px rgba(0,0,0,0.35)}
 .pin.hidden{display:none !important}
@@ -104,6 +96,71 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   #panel.shift{right:16px}
   #pendientes-panel{width:100%;top:88px;height:calc(100vh - 88px)}
 }
+/* ── Tooltip con foto ── */
+.pin-tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  padding: 8px;
+  width: 130px;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 100; /*Se cambia de 50 a 200*/
+  white-space: normal;
+  /* Por defecto aparece ARRIBA */
+  bottom: calc(100% + 8px);
+  top: auto;
+}
+.pin:hover {
+  z-index: 200 !important;
+}
+.pin:hover .pin-tooltip { opacity: 1; }
+
+/* Si el pin tiene clase .tooltip-below, aparece ABAJO */
+.pin.tooltip-below .pin-tooltip {
+  top: calc(100% + 8px);
+  bottom: auto;
+}
+
+/* Evitar que se corte por los lados */
+.pin.tooltip-left .pin-tooltip {
+  left: 0;
+  transform: none;
+}
+.pin.tooltip-right .pin-tooltip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.pin-tooltip img {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid #eee;
+  display: block;
+  margin: 0 auto 5px;
+}
+.pin-tooltip-nombre {
+  font-size: 11px;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.3;
+}
+.pin-tooltip-noimg {
+  font-size: 11px;
+  font-weight: 600;
+  color: #222;
+  padding: 4px 0;
+  line-height: 1.3;
+}
 </style>
 </head>
 <body>
@@ -134,6 +191,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   <div class="leg"><div class="leg-dot" style="background:#F57F17"></div>N.I.2°</div>
   <div class="leg"><div class="leg-dot" style="background:#BF360C"></div>N.I.3°</div>
   <div class="leg"><div class="leg-dot" style="background:#00838F"></div>Préstamo</div>
+  <!-- <div class="leg"><div class="leg-dot" style="background:#00838F"></div>Préstamo</div> -->
   <div class="leg"><div class="leg-dot" style="background:#757575"></div>Pendiente</div>
   <div class="leg-sep"></div>
   <span style="color:#bbb;font-size:12px">Arrastra un pin · Modo ubicar: clic → coords</span>
@@ -145,7 +203,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   <button class="filter-btn fb-dsaa" data-area="DSAA">DSAA (<span id="cnt-dsaa"></span>)</button>
   <button class="filter-btn fb-dnaj" data-area="DNAJ">DNAJ (<span id="cnt-dnaj"></span>)</button>
   <button id="mode-btn">&#x1F4CD; Modo ubicar</button>
-  <button id="orgchart-btn">&#128193; Organigrama</button>
   <button id="export-btn">&#128229; Exportar</button>
   <button id="pendientes-btn">⏳ Pendientes <span id="pendientes-badge">—</span></button>
 </div>
@@ -153,7 +210,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 <div id="map-container">
   <div id="map-wrap">
     <img id="floor-img" src="" alt="Plano CCOPS">
-    <svg id="org-lines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
     <div id="pins-layer"></div>
   </div>
 </div>
@@ -218,7 +274,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "CESAR_ALEXEI_CARRIZALES_MAYORGA.jpeg"
   },
   {
     "id": 2,
@@ -233,7 +290,8 @@ const personalBase = [
     "matricula": "311094967",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "DANIEL_ENRIQUE_VILLALPANDO_CHAVEZ.jpeg"
   },
   {
     "id": 3,
@@ -248,7 +306,8 @@ const personalBase = [
     "matricula": "311095381",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "INES_HERRERA_GARCIA.jpeg"
   },
   {
     "id": 4,
@@ -263,7 +322,8 @@ const personalBase = [
     "matricula": "311093070",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "SUEMI_MYRIAM_VELAZQUEZ_TORRES.png"
   },
   {
     "id": 5,
@@ -278,7 +338,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "CLAUDIA_LORENA_TOSCANO_CHAVEZ.jpeg"
   },
   {
     "id": 6,
@@ -293,7 +354,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "NALLELY_IRENE_CABALLERO_GUZMAN.jpeg"
   },
   {
     "id": 7,
@@ -308,7 +370,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "LUCIA_ILEANA_VILLALON_TRUJILLO.png"
   },
   {
     "id": 8,
@@ -323,7 +386,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "HUMBERTO_LEON_PALOMINO.jpeg"
   },
   {
     "id": 9,
@@ -338,7 +402,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "FERNANDO_MENDOZA_ELVIRA.jpeg"
   },
   {
     "id": 10,
@@ -353,7 +418,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "TERESA_FLORES_VALENCIA.jpeg"
   },
   {
     "id": 11,
@@ -368,7 +434,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ANA_MARIA_GARDUNO_GARCIA.jpeg"
   },
   {
     "id": 12,
@@ -383,7 +450,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "BRISA_CELESTE_MARQUEZ_GONZALEZ.jpeg"
   },
   {
     "id": 13,
@@ -398,7 +466,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "MARIO_RAMIREZ_ALVARADO.jpeg"
   },
   {
     "id": 14,
@@ -413,7 +482,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "YENIFER_STHEPHANIE_MARTINEZ_RIVERA.jpeg"
   },
   {
     "id": 15,
@@ -428,7 +498,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "OSCAR_VILLANUEVA_OLIVARES.jpeg"
   },
   {
     "id": 16,
@@ -443,7 +514,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "CARLOS_ALBERTO_ROJAS_HEREDIA.jpeg"
   },
   {
     "id": 17,
@@ -458,7 +530,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "VICENTA_MIRYAM_ROMAN_NAVARRETE.jpeg"
   },
   {
     "id": 18,
@@ -473,7 +546,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#6A1B9A",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "EDGAR_ALEJANDRO_PEREZ_LUNA.jpeg"
   },
   {
     "id": 19,
@@ -518,7 +592,8 @@ const personalBase = [
     "matricula": "311092593",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JOSE_ALFONSO_GARFIAS_CORONA.jpeg"
   },
   {
     "id": 22,
@@ -533,7 +608,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALEJANDRO_TONATIUH_GUZMAN_MEDELLIN.jpeg"
   },
   {
     "id": 23,
@@ -548,7 +624,8 @@ const personalBase = [
     "matricula": "311095748",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "LUIS_DAVID_ROMAN_RUIZ.jpeg"
   },
   {
     "id": 24,
@@ -563,7 +640,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "IVONNE_ENRIQUETA_REYES_CARDENAS.png"
   },
   {
     "id": 25,
@@ -578,7 +656,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "MARTHA_SUSANA_HERNANDEZ_RANGEL.jpeg"
   },
   {
     "id": 26,
@@ -593,7 +672,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "ADRIAN_PICHARDO_LEYTE.jpeg"
   },
   {
     "id": 27,
@@ -608,7 +688,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#1565C0",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "VICTOR_MANUEL_SANCHEZ_TAFOYA.jpeg"
   },
   {
     "id": 28,
@@ -623,7 +704,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "RAUL_ALAMEDA_DE_LA_MORA.png"
   },
   {
     "id": 29,
@@ -638,7 +720,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "MARIO_EMILIO_SIGUENZA_CAMACHO.png"
   },
   {
     "id": 30,
@@ -653,7 +736,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "MARIA_KARINA_SANCHEZ_TORRES.jpeg"
   },
   {
     "id": 31,
@@ -668,7 +752,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "NOHEMI_RUIZ_ANGELES.png"
   },
   {
     "id": 32,
@@ -698,7 +783,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "DIANA_RAQUEL_OLIVARES_CARMONA.jpg"
   },
   {
     "id": 34,
@@ -713,7 +799,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALEJANDRO_FONG_SURIANO.png"
   },
   {
     "id": 35,
@@ -728,7 +815,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "CHRISTIAN_PALOMINO_GARCIA.jpeg"
   },
   {
     "id": 36,
@@ -743,7 +831,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "FERNANDO_MENDOZA_AQUINO.jpeg"
   },
   {
     "id": 37,
@@ -758,7 +847,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JOSE_REGULO_LOPEZ_ACEVES.jpeg"
   },
   {
     "id": 38,
@@ -773,7 +863,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JOSE_LUIS_DIAZ_LARA.jpeg"
   },
   {
     "id": 39,
@@ -788,7 +879,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "MIGUEL_ANGEL_GONZALEZ_BAUTISTA.png"
   },
   {
     "id": 40,
@@ -803,7 +895,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "VANESSA_PAULINA_DE_SANJUAN_GONZALEZ.png"
   },
   {
     "id": 41,
@@ -818,7 +911,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "PEDRO_YAIR_GOMEZ_RIVERA.jpeg"
   },
   {
     "id": 42,
@@ -833,7 +927,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "MIGUEL_ANGEL_MONTOYA_CHAVEZ.jpeg"
   },
   {
     "id": 43,
@@ -848,7 +943,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "AMISADAI_PAMELA_CABALLERO_LOPEZ.jpeg"
   },
   {
     "id": 44,
@@ -863,7 +959,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "KARLA_VAZQUEZ_DEL_ANGEL.png"
   },
   {
     "id": 45,
@@ -878,7 +975,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ENRIQUE_JOEL_BALTAZARES_LUNA.jpeg"
   },
   {
     "id": 46,
@@ -893,7 +991,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "KARLA_GABRIELA_ISLAS_ALONSO.png"
   },
   {
     "id": 47,
@@ -908,7 +1007,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ARACELI_GARCIA_GARCIA.jpeg"
   },
   {
     "id": 48,
@@ -923,7 +1023,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "LORENA_RODRIGUEZ_PANTOJA.png"
   },
   {
     "id": 49,
@@ -938,7 +1039,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ZAIRA_LILIANA_JIMENEZ_SEADE.png"
   },
   {
     "id": 50,
@@ -953,7 +1055,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "ESTEFANIA_MONSERRAT_RAMIREZ_SABIDO.jpeg"
   },
   {
     "id": 51,
@@ -968,7 +1071,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "AIDEE_SUSANA_GARCIA_AGUILAR.png"
   },
   {
     "id": 52,
@@ -983,7 +1087,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "RUBEN_ISRAEL_MARTINEZ_MEDINA.jpeg"
   },
   {
     "id": 53,
@@ -998,7 +1103,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "CLAUDIA_PAVON_GOMEZ.jpeg"
   },
   {
     "id": 54,
@@ -1013,7 +1119,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "NAXHIELI_BERENICE_VALERIO_LOPEZ.jpeg"
   },
   {
     "id": 55,
@@ -1028,7 +1135,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "LESLIE_GUADALUPE_ROMERO_BARRIGA.jpeg"
   },
   {
     "id": 56,
@@ -1043,7 +1151,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "RICARDO_ISRAEL_QUINTANAR_CARRILLO.jpeg"
   },
   {
     "id": 57,
@@ -1058,7 +1167,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "GUILLERMINA_JUAREZ_CONTRERAS.png"
   },
   {
     "id": 58,
@@ -1073,7 +1183,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "BLANCA_ESTELA_GARCIA_MACIAS.png"
   },
   {
     "id": 59,
@@ -1088,7 +1199,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "MARCO_EMMANUEL_MEDINA_AMADOR.jpeg"
   },
   {
     "id": 60,
@@ -1103,7 +1215,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "EDGAR_CAMACHO_ACOSTA.jpeg"
   },
   {
     "id": 61,
@@ -1118,7 +1231,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "GEORGINA_DE_LA_PAZ_PANTOJA.jpeg"
   },
   {
     "id": 62,
@@ -1133,7 +1247,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "KEVIN_RUBEN_MARQUEZ_GONZALEZ.jpeg"
   },
   {
     "id": 63,
@@ -1148,7 +1263,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "ROSENDO_RENE_REBOLLEDO_MARQUEZ.jpeg"
   },
   {
     "id": 64,
@@ -1163,7 +1279,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "XOCHITL_SALGADO_FLORES.jpeg"
   },
   {
     "id": 65,
@@ -1178,7 +1295,8 @@ const personalBase = [
     "matricula": "311094839",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "SAUL_GONZALEZ_MARTINEZ.jpeg"
   },
   {
     "id": 66,
@@ -1193,7 +1311,8 @@ const personalBase = [
     "matricula": "311094840",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "SANTANA_ALFONSO_VALDES_BADILLO.jpeg"
   },
   {
     "id": 67,
@@ -1208,7 +1327,8 @@ const personalBase = [
     "matricula": "311091292",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "TANIA_ESTEFANIA_GUTIERREZ_CASTRUITA.jpg"
   },
   {
     "id": 68,
@@ -1223,7 +1343,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALICIA_CAMPOS_CABALLERO.png"
   },
   {
     "id": 69,
@@ -1238,7 +1359,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ERIK_ALFREDO_GAONA_REYES.jpeg"
   },
   {
     "id": 70,
@@ -1253,7 +1375,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "RAFAEL_PEREZ_FIGUEROA.jpeg"
   },
   {
     "id": 71,
@@ -1268,7 +1391,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALEJANDRO_MORALES_MADRIGAL.png"
   },
   {
     "id": 72,
@@ -1283,7 +1407,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "CINTHYA_MILER_SALINAS.jpeg"
   },
   {
     "id": 73,
@@ -1298,7 +1423,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JOSE_RAMON_RAMIREZ_GOROSTIZA.png"
   },
   {
     "id": 74,
@@ -1313,7 +1439,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "ROBERTO_RICARDEZ_MENDOZA.jpeg"
   },
   {
     "id": 75,
@@ -1328,7 +1455,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#1565C0"
+    "ecolor": "#1565C0",
+    "foto": "RUEL_ALEJANDRO_LEYVA_PAREDES.jpeg"
   },
   {
     "id": 76,
@@ -1343,7 +1471,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "MAYRA_LUZ_AMBROCIO_MENDEZ.png"
   },
   {
     "id": 77,
@@ -1358,7 +1487,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#F57F17"
+    "ecolor": "#F57F17",
+    "foto": "GUILLERMO_MANRIQUE_FERNANDEZ.png"
   },
   {
     "id": 78,
@@ -1373,7 +1503,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "MARIANA_CRUZ_FRAGOSO.jpeg"
   },
   {
     "id": 79,
@@ -1388,7 +1519,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#BF360C"
+    "ecolor": "#BF360C",
+    "foto": "JESSICA_MAQUEDA_RAMOS.jpeg"
   },
   {
     "id": 80,
@@ -1403,7 +1535,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "MARCOS_RODRIGO_MALDONADO_LOPEZ.jpeg"
   },
   {
     "id": 81,
@@ -1418,7 +1551,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "BERENICE_ALEJANDRA_GARCIA_OROZCO.jpeg"
   },
   {
     "id": 82,
@@ -1448,7 +1582,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#E65100",
-    "ecolor": "#757575"
+    "ecolor": "#757575",
+    "foto": "ALEXA_NAIAN_PALENCIA_FERNANDEZ.jpeg"
   },
   {
     "id": 84,
@@ -1463,7 +1598,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "LILIANA_ELIZABETH_RAMOS_ROLDAN.jpeg"
   },
   {
     "id": 85,
@@ -1478,7 +1614,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JOSE_ARMANDO_ZAMUDIO_CAMARILLO.jpeg"
   },
   {
     "id": 86,
@@ -1493,7 +1630,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "ALFONSO_ALVARADO_RAYA.jpeg"
   },
   {
     "id": 87,
@@ -1508,7 +1646,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JULIETA_DEL_CONSUELO_ROJAS_PENA.jpeg"
   },
   {
     "id": 88,
@@ -1523,7 +1662,8 @@ const personalBase = [
     "matricula": "",
     "grupo": "mapa",
     "color": "#2E7D32",
-    "ecolor": "#2E7D32"
+    "ecolor": "#2E7D32",
+    "foto": "JUAN_PEDRO_ESPINOSA_CASTELLANOS.jpeg"
   },
   {
     "id": 89,
@@ -1558,94 +1698,14 @@ const personalBase = [
 ]; // ← pega aquí tu array de objetos sin x/y
 
 // ─────────────────────────────────────────────
-//  JERARQUÍA — organigrama CCOPS
-//  Se calcula a partir de "area" + "adscripcion" +
-//  los uids de los mandos, ya presentes en personalBase.
-// ─────────────────────────────────────────────
-const JEFES = {
-  CESAR: '1',       // Titular CCOPS
-  LUCIA: '7',        // Jefa DPC
-  HUMBERTO: '9',      // Jefe DSAA
-  FERNANDO: '10',     // Jefe DNAJ
-  LUISDAVID: '12',    // Titular Subjefatura Procedimientos de Contratación (bajo Lucía)
-  MARTHA: '21',       // Titular Subjefatura Contratos y Convenios (bajo Lucía)
-  JOSEREGULO: '35',   // Titular Subjefatura Atención a Órganos Fiscalizadores (bajo Humberto)
-  JOSELUIS: '40'      // Titular Subjefatura Transparencia y Certificación (bajo Humberto)
-};
-
-function getJefeUid(d) {
-  if (d.uid === JEFES.CESAR) return null; // raíz del organigrama
-  if (d.area === 'DPC') {
-    if (d.uid === JEFES.LUCIA) return JEFES.CESAR;
-    if (d.uid === JEFES.LUISDAVID) return JEFES.LUCIA;
-    if (d.uid === JEFES.MARTHA) return JEFES.LUCIA;
-    if (d.adscripcion === 'Subjefatura de División de Procedimientos de Contratación') return JEFES.LUISDAVID;
-    if (d.adscripcion === 'Subjefatura de División de Contratos y Convenios') return JEFES.MARTHA;
-    return JEFES.LUCIA; // personal directo de la división
-  }
-  if (d.area === 'DSAA') {
-    if (d.uid === JEFES.HUMBERTO) return JEFES.CESAR;
-    if (d.uid === JEFES.JOSEREGULO) return JEFES.HUMBERTO;
-    if (d.uid === JEFES.JOSELUIS) return JEFES.HUMBERTO;
-    if (d.adscripcion === 'Subjefatura de División de Procedimientos de Atención a Órganos Fiscalizadores') return JEFES.JOSEREGULO;
-    if (d.adscripcion === 'Subjefatura de División de Transparencia y Certificación') return JEFES.JOSELUIS;
-    return JEFES.HUMBERTO;
-  }
-  if (d.area === 'DNAJ') {
-    if (d.uid === JEFES.FERNANDO) return JEFES.CESAR;
-    return JEFES.FERNANDO;
-  }
-  // CCOPS (incluye préstamo, servicio social y adscripción "ccops")
-  return JEFES.CESAR;
-}
-
-// Calcula orgX/orgY (%) para cada elemento de "list", con un layout tipo árbol
-function buildOrgLayout(list) {
-  const children = {};
-  list.forEach(d => {
-    d.orgJefeUid = getJefeUid(d);
-    if (d.orgJefeUid) (children[d.orgJefeUid] = children[d.orgJefeUid] || []).push(d);
-  });
-  Object.values(children).forEach(arr => arr.sort((a, b) => {
-    const am = a.nomina === 'Mando' ? 0 : 1, bm = b.nomina === 'Mando' ? 0 : 1;
-    return am - bm || a.nombre.localeCompare(b.nombre);
-  }));
-
-  const root = list.find(d => d.orgJefeUid === null);
-  if (!root) return; // por seguridad, si no está Cesar en este layout
-
-  function countLeaves(node) {
-    const kids = children[node.uid] || [];
-    node._leaves = kids.length ? kids.reduce((s, k) => s + countLeaves(k), 0) : 1;
-    return node._leaves;
-  }
-  countLeaves(root);
-
-  const MAX_DEPTH = 3; // raíz(0) → mandos(1) → división/subjefatura(2) → staff(3)
-  function assign(node, depth, xStart, xEnd) {
-    node.orgY = 8 + depth * (84 / MAX_DEPTH);
-    node.orgX = (xStart + xEnd) / 2;
-    const kids = children[node.uid] || [];
-    let cursor = xStart;
-    kids.forEach(k => {
-      const width = (k._leaves / node._leaves) * (xEnd - xStart);
-      assign(k, depth + 1, cursor, cursor + width);
-      cursor += width;
-    });
-  }
-  assign(root, 0, 2, 98);
-}
-
-// ─────────────────────────────────────────────
 //  ESTADO GLOBAL
 // ─────────────────────────────────────────────
 let devices = [];
 let currentLayout = null; // 'horizontal' | 'vertical'
-let locateMode = false, orgMode = false, activeId = null, pendOpen = false, toastTimer;
+let locateMode = false, activeId = null, pendOpen = false, toastTimer;
 
 // Referencias DOM
 const layer    = document.getElementById('pins-layer');
-const linesLayer = document.getElementById('org-lines');
 const img      = document.getElementById('floor-img');
 const mapWrap  = document.getElementById('map-wrap');
 const mapCont  = document.getElementById('map-container');
@@ -1654,8 +1714,6 @@ const toast    = document.getElementById('toast');
 const overlay  = document.getElementById('loading-overlay');
 const layoutInd = document.getElementById('layout-indicator');
 const layoutLbl = document.getElementById('layout-label');
-const modeBtn  = document.getElementById('mode-btn');
-const orgBtn   = document.getElementById('orgchart-btn');
 
 // ─────────────────────────────────────────────
 //  DETECCIÓN DE LAYOUT
@@ -1704,8 +1762,6 @@ async function loadLayout(layout) {
       y: coordsMap[d.id]?.y ?? d.y ?? 50
     }));
 
-    buildOrgLayout(devices);
-
     // Actualiza indicador de modo
     layoutInd.className = 'layout-indicator ' + layout;
     layoutLbl.textContent = layout === 'horizontal' ? '🖥 PC' : '📱 Móvil';
@@ -1753,67 +1809,35 @@ function initPins() {
   devices.filter(d => d.grupo === 'mapa').forEach(d => {
     const pin = document.createElement('div');
     pin.className = 'pin'; pin.dataset.id = d.id; pin.dataset.area = d.area;
-    pin.style.left = (orgMode ? d.orgX : d.x) + '%';
-    pin.style.top = (orgMode ? d.orgY : d.y) + '%';
+    pin.style.left = d.x + '%'; pin.style.top = d.y + '%';
     const c = document.createElement('div');
     c.className = 'pin-circle'; c.style.background = d.color;
     const p = d.nombre.trim().split(' ');
     c.textContent = (p[0]?.[0] || '').toUpperCase() + (p[1]?.[0] || '').toUpperCase();
-    c.title = d.nombre; pin.appendChild(c);
+    pin.appendChild(c);
+    // Tooltip fotos
+    const tt = document.createElement('div');
+    tt.className = 'pin-tooltip';
+    if (d.foto) {
+      tt.innerHTML = `<img src="fotos_personal_ccops/${d.foto}" alt="${d.nombre}" onerror="this.style.display='none'">
+        <div class="pin-tooltip-nombre">${d.nombre}</div>`;
+    } else {
+      tt.innerHTML = `<div class="pin-tooltip-noimg">${d.nombre}</div>`;
+    }
+    pin.appendChild(tt); // Suguerencia de Claude para mostrar fotos
     pin.addEventListener('click', e => { if (!locateMode) { e.stopPropagation(); showPanel(d.id); } });
     makeDraggable(pin, d);
     layer.appendChild(pin);
+    // Ajuste de posición del tooltip según ubicación del pin
+    (function ajustarTooltip() {
+      const y = parseFloat(pin.style.top);
+      const x = parseFloat(pin.style.left);
+      if (y < 25) pin.classList.add('tooltip-below');
+      if (x < 15) pin.classList.add('tooltip-left');
+      if (x > 85) pin.classList.add('tooltip-right');
+    })();
   });
   buildPendientesPanel(); updateCounts(); applyFilters();
-  if (orgMode) drawOrgLines();
-}
-
-// ─────────────────────────────────────────────
-//  TOGGLE ORGANIGRAMA
-// ─────────────────────────────────────────────
-orgBtn.addEventListener('click', () => {
-  if (locateMode) { modeBtn.click(); } // salir de modo ubicar si estaba activo
-  orgMode = !orgMode;
-  orgBtn.classList.toggle('active', orgMode);
-  panel.style.display = 'none';
-
-  const pins = document.querySelectorAll('.pin');
-  pins.forEach(p => p.classList.add('org-anim'));
-  img.classList.toggle('faded', orgMode);
-
-  if (orgMode) {
-    linesLayer.innerHTML = '';
-    pins.forEach(pin => {
-      const d = devices.find(x => x.id === +pin.dataset.id);
-      if (!d) return;
-      pin.style.left = d.orgX + '%';
-      pin.style.top = d.orgY + '%';
-    });
-    setTimeout(drawOrgLines, 680);
-  } else {
-    linesLayer.style.opacity = '0';
-    setTimeout(() => { linesLayer.innerHTML = ''; linesLayer.style.opacity = '1'; }, 350);
-    pins.forEach(pin => {
-      const d = devices.find(x => x.id === +pin.dataset.id);
-      if (!d) return;
-      pin.style.left = d.x + '%';
-      pin.style.top = d.y + '%';
-    });
-  }
-  setTimeout(() => pins.forEach(p => p.classList.remove('org-anim')), 900);
-});
-
-function drawOrgLines() {
-  linesLayer.innerHTML = '';
-  devices.filter(d => d.grupo === 'mapa' && d.orgJefeUid).forEach(d => {
-    const jefe = devices.find(x => x.uid === d.orgJefeUid && x.grupo === 'mapa');
-    if (!jefe) return;
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', jefe.orgX); line.setAttribute('y1', jefe.orgY);
-    line.setAttribute('x2', d.orgX);    line.setAttribute('y2', d.orgY);
-    line.setAttribute('class', 'org-line');
-    linesLayer.appendChild(line);
-  });
 }
 
 // ─────────────────────────────────────────────
@@ -1855,7 +1879,7 @@ function showPanelData(d) {
     rows.appendChild(r);
   });
   const cr = document.getElementById('coords-row'), hint = document.getElementById('edit-hint');
-  if (d.grupo === 'pendiente' || orgMode) { cr.style.display = 'none'; hint.style.display = 'none'; }
+  if (d.grupo === 'pendiente') { cr.style.display = 'none'; hint.style.display = 'none'; }
   else { cr.style.display = 'flex'; hint.style.display = 'block'; updatePanelCoords(d); }
   panel.classList.toggle('shift', pendOpen);
   panel.style.display = 'block';
@@ -1877,12 +1901,12 @@ document.getElementById('pendientes-btn').addEventListener('click', () => {
 });
 
 // ─────────────────────────────────────────────
-//  DRAG (deshabilitado en modo organigrama)
+//  DRAG (sin cambios respecto al original)
 // ─────────────────────────────────────────────
 function makeDraggable(pin, d) {
   let dragging = false, startX, startY;
   pin.addEventListener('mousedown', e => {
-    if (locateMode || orgMode) return; e.preventDefault(); dragging = false; startX = e.clientX; startY = e.clientY;
+    if (locateMode) return; e.preventDefault(); dragging = false; startX = e.clientX; startY = e.clientY;
     const onMove = mv => {
       if (!dragging && Math.hypot(mv.clientX - startX, mv.clientY - startY) > 4) { dragging = true; pin.classList.add('drag-active'); }
       if (!dragging) return;
@@ -1905,8 +1929,8 @@ function makeDraggable(pin, d) {
 // ─────────────────────────────────────────────
 //  MODO UBICAR
 // ─────────────────────────────────────────────
+const modeBtn = document.getElementById('mode-btn');
 modeBtn.addEventListener('click', () => {
-  if (orgMode) return; // no permitido en modo organigrama
   locateMode = !locateMode; modeBtn.classList.toggle('active', locateMode);
   mapCont.classList.toggle('locate-mode', locateMode);
   showToast(locateMode ? 'Modo ubicar activo — clic en el plano' : 'Modo ubicar desactivado');
