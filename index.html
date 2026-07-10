@@ -2103,12 +2103,16 @@ function updateOrgZoom() {
     minX = Math.min(minX, d.orgX); maxX = Math.max(maxX, d.orgX);
     minY = Math.min(minY, d.orgY); maxY = Math.max(maxY, d.orgY);
   });
-  const pad = 9;
+  const rawW = Math.max(maxX - minX, 4), rawH = Math.max(maxY - minY, 4);
+  // 1ra pasada: escala aproximada, para saber cuánto "cuesta" en % visual el padding
+  const rawScale = Math.min(100 / rawW, 100 / rawH, 4.5);
+  const visualPad = 11; // % de margen visual deseado alrededor del árbol (constante, no importa el zoom)
+  const pad = visualPad / rawScale;
   minX = Math.max(0, minX - pad); maxX = Math.min(100, maxX + pad);
   minY = Math.max(0, minY - pad); maxY = Math.min(100, maxY + pad);
   const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-  const w = Math.max(maxX - minX, 8), h = Math.max(maxY - minY, 8);
-  const scale = Math.min(Math.min(100 / w, 100 / h), 4.5);
+  const w = Math.max(maxX - minX, 6), h = Math.max(maxY - minY, 6);
+  const scale = Math.min(100 / w, 100 / h, 4.5);
   const tx = 50 - cx, ty = 50 - cy;
   [layer, linesLayer].forEach(el => {
     el.style.transformOrigin = `${cx}% ${cy}%`;
