@@ -2005,7 +2005,7 @@ function initPins() {
 // ─────────────────────────────────────────────
 orgBtn.addEventListener('click', () => {
   hideTooltip();
-  if (locateMode) modeBtn.click(); // salir de modo ubicar si estaba activo
+  if (locateMode) modeBtn.click();
   orgMode = !orgMode;
   orgBtn.classList.toggle('active', orgMode);
   panel.style.display = 'none';
@@ -2016,21 +2016,14 @@ orgBtn.addEventListener('click', () => {
 
   if (orgMode) {
     linesLayer.innerHTML = '';
-    pins.forEach(pin => {
-      const d = devices.find(x => x.id === +pin.dataset.id);
-      if (!d) return;
-      pin.style.left = d.orgX + '%'; pin.style.top = d.orgY + '%';
-    });
+    positionAllPins();
+    updateOrgZoom();
     setTimeout(drawOrgLines, 680);
   } else {
     linesLayer.style.opacity = '0';
     setTimeout(() => { linesLayer.innerHTML = ''; linesLayer.style.opacity = '1'; }, 350);
-    pins.forEach(pin => {
-      const d = devices.find(x => x.id === +pin.dataset.id);
-      if (!d) return;
-      pin.style.left = d.x + '%'; pin.style.top = d.y + '%';
-      updateTooltipDir(pin, d.x, d.y);
-    });
+    positionAllPins();
+    updateOrgZoom();
   }
   setTimeout(() => pins.forEach(p => p.classList.remove('org-anim')), 900);
 });
@@ -2071,6 +2064,14 @@ function updateOrgZoom() {
   [layer, linesLayer].forEach(el => {
     el.style.transformOrigin = `${cx}% ${cy}%`;
     el.style.transform = `translate(${tx}%, ${ty}%) scale(${scale})`;
+  });
+}
+  function positionAllPins() {
+  document.querySelectorAll('.pin').forEach(pin => {
+    const d = devices.find(x => x.id === +pin.dataset.id);
+    if (!d) return;
+    pin.style.left = (orgMode ? d.orgX : d.x) + '%';
+    pin.style.top  = (orgMode ? d.orgY : d.y) + '%';
   });
 }
 // ─────────────────────────────────────────────
@@ -2223,9 +2224,9 @@ function applyFilters() {
   document.getElementById('stat-count').textContent = currentSearch
     ? `${v + vp} coincidencia${(v + vp) !== 1 ? 's' : ''}`
     : `${v} personas en plano`;
-  updateOrgZoom();
   hideTooltip();
-  if (orgMode) drawOrgLines();
+  positionAllPins();
+  if (orgMode) drawOrgLines(); else linesLayer.innerHTML = '';
   updateOrgZoom();
 }
 
