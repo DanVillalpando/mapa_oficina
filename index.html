@@ -184,6 +184,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   line-height: 1.3;
   margin-top: 2px;
 }
+/*Imagen a un lado*/
+.pin.tooltip-side .pin-tooltip {
+  bottom: auto;
+  top: 50%;
+  left: auto;
+  right: calc(100% + 10px);
+  transform: translateY(-50%);
+}
 </style>
 </head>
 <body>
@@ -2000,7 +2008,8 @@ window.addEventListener('resize', onLayoutChange);
 //  DIRECCIÓN DEL TOOLTIP (según posición del pin)
 // ─────────────────────────────────────────────
 function updateTooltipDir(pin, x, y) {
-  pin.classList.remove('tooltip-below', 'tooltip-left', 'tooltip-right');
+  pin.classList.remove('tooltip-below', 'tooltip-left', 'tooltip-right', 'tooltip-side');
+  if (orgMode && currentArea !== 'all') { pin.classList.add('tooltip-side'); return; }
   if (y < 25) pin.classList.add('tooltip-below');
   if (x < 15) pin.classList.add('tooltip-left');
   if (x > 85) pin.classList.add('tooltip-right');
@@ -2103,16 +2112,12 @@ function updateOrgZoom() {
     minX = Math.min(minX, d.orgX); maxX = Math.max(maxX, d.orgX);
     minY = Math.min(minY, d.orgY); maxY = Math.max(maxY, d.orgY);
   });
-  const rawW = Math.max(maxX - minX, 4), rawH = Math.max(maxY - minY, 4);
-  // 1ra pasada: escala aproximada, para saber cuánto "cuesta" en % visual el padding
-  const rawScale = Math.min(100 / rawW, 100 / rawH, 4.5);
-  const visualPad = 11; // % de margen visual deseado alrededor del árbol (constante, no importa el zoom)
-  const pad = visualPad / rawScale;
-  minX = Math.max(0, minX - pad); maxX = Math.min(100, maxX + pad);
-  minY = Math.max(0, minY - pad); maxY = Math.min(100, maxY + pad);
+  const PAD = 14; // margen fijo, simple y predecible
+  minX = Math.max(0, minX - PAD); maxX = Math.min(100, maxX + PAD);
+  minY = Math.max(0, minY - PAD); maxY = Math.min(100, maxY + PAD);
   const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-  const w = Math.max(maxX - minX, 6), h = Math.max(maxY - minY, 6);
-  const scale = Math.min(100 / w, 100 / h, 4.5);
+  const w = Math.max(maxX - minX, 10), h = Math.max(maxY - minY, 10);
+  const scale = Math.min(Math.min(100 / w, 100 / h), 2.4); // tope menos agresivo (antes 4.5)
   const tx = 50 - cx, ty = 50 - cy;
   [layer, linesLayer].forEach(el => {
     el.style.transformOrigin = `${cx}% ${cy}%`;
