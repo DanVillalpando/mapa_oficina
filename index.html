@@ -53,8 +53,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 #map-wrap{position:relative;width:100%;height:100%}
 #floor-img{display:block;width:100%;height:100%;object-fit:contain;transition:opacity .5s ease}
 #floor-img.faded{opacity:0}
-#pins-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
-#org-lines{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:1;transition:opacity .35s ease}
+#pins-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+#org-lines{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:1;transition:opacity .35s ease, transform .6s cubic-bezier(.4,0,.2,1)}
 .org-line{stroke:#90A4AE;stroke-width:.28;fill:none;opacity:0;animation:lineFadeIn .5s ease forwards}
 @keyframes lineFadeIn{to{opacity:.85}}
 .pin{position:absolute;transform:translate(-50%,-50%);pointer-events:all;cursor:pointer;z-index:10}
@@ -2079,7 +2079,7 @@ orgBtn.addEventListener('click', () => {
 
 function drawOrgLines() {
   linesLayer.innerHTML = '';
-  devices.filter(d => d.grupo === 'mapa' && d.orgJefeUid).forEach(d => {
+  devices.filter(d => d.grupo === 'mapa' && d.orgJefeUid && (currentArea === 'all' || d.area === currentArea)).forEach(d => {
     const jefe = devices.find(x => x.uid === d.orgJefeUid && x.grupo === 'mapa');
     if (!jefe) return;
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -2089,7 +2089,32 @@ function drawOrgLines() {
     linesLayer.appendChild(line);
   });
 }
-
+  // Nueva función zoom
+function updateOrgZoom() {
+  if (!orgMode || currentArea === 'all') {
+    layer.style.transformOrigin = '50% 50%'; layer.style.transform = 'none';
+    linesLayer.style.transformOrigin = '50% 50%'; linesLayer.style.transform = 'none';
+    return;
+  }
+  const nodes = devices.filter(d => d.grupo === 'mapa' && d.area === currentArea && d.orgX !== undefined);
+  if (!nodes.length) return;
+  let minX = 100, maxX = 0, minY = 100, maxY = 0;
+  nodes.forEach(d => {
+    minX = Math.min(minX, d.orgX); maxX = Math.max(maxX, d.orgX);
+    minY = Math.min(minY, d.orgY); maxY = Math.max(maxY, d.orgY);
+  });
+  const pad = 9;
+  minX = Math.max(0, minX - pad); maxX = Math.min(100, maxX + pad);
+  minY = Math.max(0, minY - pad); maxY = Math.min(100, maxY + pad);
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  const w = Math.max(maxX - minX, 8), h = Math.max(maxY - minY, 8);
+  const scale = Math.min(Math.min(100 / w, 100 / h), 4.5);
+  const tx = 50 - cx, ty = 50 - cy;
+  [layer, linesLayer].forEach(el => {
+    el.style.transformOrigin = `${cx}% ${cy}%`;
+    el.style.transform = `translate(${tx}%, ${ty}%) scale(${scale})`;
+  });
+}
 // ─────────────────────────────────────────────
 //  PANEL PENDIENTES
 // ─────────────────────────────────────────────
@@ -2241,6 +2266,7 @@ function applyFilters() {
   document.getElementById('stat-count').textContent = currentSearch
     ? `${v + vp} coincidencia${(v + vp) !== 1 ? 's' : ''}`
     : `${v} personas en plano`;
+  updateOrgZoom();
 }
 
 function updateCounts() {
