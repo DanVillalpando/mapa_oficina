@@ -28,6 +28,25 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 #mode-btn.active{background:#1565C0;color:#fff}
 #orgchart-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #37474F;color:#37474F;background:#fff;cursor:pointer;font-weight:600;transition:all .15s}
 #orgchart-btn.active{background:#37474F;color:#fff}
+.floor-btn.active{color:#00838F;border-color:#00838F;background:#E0F2F1}
+#assign-floor-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #E65100;color:#E65100;background:#fff;cursor:pointer;font-weight:600;transition:all .15s}
+#assign-floor-btn.active{background:#E65100;color:#fff}
+#proposal-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #6A1B9A;color:#6A1B9A;background:#fff;cursor:pointer;font-weight:600;transition:all .15s}
+#proposal-btn.active{background:#6A1B9A;color:#fff}
+#proposal-banner{display:none;position:fixed;top:120px;left:50%;transform:translateX(-50%);background:#6A1B9A;color:#fff;font-size:13px;font-weight:700;padding:5px 16px;border-radius:0 0 10px 10px;z-index:250;box-shadow:0 4px 10px rgba(0,0,0,0.2)}
+#proposal-banner.active{display:block}
+#proposal-banner button{margin-left:10px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:14px;border:1px solid rgba(255,255,255,0.6);background:transparent;color:#fff;cursor:pointer}
+.pin-floor-badge{position:absolute;top:-4px;right:-4px;background:#00838F;color:#fff;font-size:8px;font-weight:800;line-height:1;border-radius:50%;width:13px;height:13px;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff}
+#traslados-panel{position:fixed;top:120px;left:0;width:285px;background:#fff;border-right:3px solid #E65100;border-top:1px solid #ddd;display:none;z-index:300;height:calc(100vh - 120px);overflow-y:auto;box-shadow:4px 0 16px rgba(0,0,0,0.1)}
+#traslados-panel.open{display:block}
+#traslados-panel-header{font-size:15px;font-weight:700;padding:12px 14px 10px;border-bottom:1px solid #eee;color:#E65100;position:sticky;top:0;background:#fff;z-index:1}
+#traslados-panel-header span{font-size:13px;font-weight:400;color:#aaa}
+#traslados-empty{padding:16px 14px;font-size:13px;color:#aaa;line-height:1.5}
+.traslado-card{padding:10px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background .1s}
+.traslado-card:hover{background:#fff3e0}
+.traslado-card-nombre{font-size:14px;font-weight:600;color:#333;margin-bottom:2px}
+.traslado-card-sub{font-size:12px;color:#999}
+.traslado-card-back{font-size:11px;color:#E65100;font-weight:600;margin-top:3px}
 #export-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #888;color:#555;background:#fff;cursor:pointer}
 #pendientes-btn{font-size:13px;padding:3px 11px;border-radius:20px;border:1.5px solid #757575;color:#555;background:#fff;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:5px;transition:all .15s;margin-left:auto}
 #pendientes-btn.active{background:#757575;color:#fff}
@@ -181,16 +200,31 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
   <button class="filter-btn fb-dnaj" data-area="DNAJ">DNAJ (<span id="cnt-dnaj"></span>)</button>
   <button id="mode-btn">&#x1F4CD; Modo ubicar</button>
   <button id="orgchart-btn">&#128193; Organigrama</button>
+  <span class="leg-sep"></span>
+  <button class="filter-btn floor-btn active" data-floor="1">🏢 Piso 1</button>
+  <button class="filter-btn floor-btn" data-floor="6">🏢 Piso 6</button>
+  <span class="leg-sep"></span>
+  <button id="assign-floor-btn" title="Reasigna personas entre pisos con un clic">&#128257; Asignar piso</button>
+  <button id="proposal-btn" title="Mueve pines libremente sin afectar el plano oficial">&#128204; Propuesta</button>
   <button id="export-btn">&#128229; Exportar</button>
   <button id="pendientes-btn">⏳ Pendientes <span id="pendientes-badge">—</span></button>
 </div>
 
+<div id="proposal-banner">📌 Modo Propuesta — los cambios se guardan solo en este navegador
+  <button id="proposal-discard-btn">Descartar</button>
+</div>
 <div id="map-container">
   <div id="map-wrap">
     <img id="floor-img" src="" alt="Plano CCOPS">
     <svg id="org-lines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
     <div id="pins-layer"></div>
   </div>
+</div>
+
+<div id="traslados-panel">
+  <div id="traslados-panel-header">🔁 Trasladados <span id="traslados-subtitle"></span></div>
+  <div id="traslados-empty">Nadie se ha movido todavía. Haz clic en un pin del plano para pasarlo al otro piso — aparecerá aquí.</div>
+  <div id="traslados-list"></div>
 </div>
 
 <div id="pendientes-panel">
@@ -219,13 +253,27 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f0f0;color:#222;overf
 //  CONFIGURACIÓN — ajusta estas rutas a tu repo
 // ─────────────────────────────────────────────
 const CONFIG = {
-  img: {
-    horizontal: 'imagen-horizontal-plano.jpg',
-    vertical:   'imagen-vertical-plano.jpg'
-  },
-  coords: {
-    horizontal: 'coords-horizontal.json',
-    vertical:   'coords-vertical.json'
+  floors: {
+    1: {
+      img: {
+        horizontal: 'imagen-horizontal-plano.jpg',
+        vertical:   'imagen-vertical-plano.jpg'
+      },
+      coords: {
+        horizontal: 'coords-horizontal.json',
+        vertical:   'coords-vertical.json'
+      }
+    },
+    6: {
+      img: {
+        horizontal: 'imagen-horizontal-piso6.jpg',
+        vertical:   'imagen-vertical-piso6.jpg'
+      },
+      coords: {
+        horizontal: 'coords-horizontal-piso6.json',
+        vertical:   'coords-vertical-piso6.json'
+      }
+    }
   },
   mobileBreakpoint: 767
 };
@@ -237,6 +285,7 @@ const CONFIG = {
 const personalBase = [
   {
     id: 1,
+    piso: 1,
     uid: "1",
     nombre: "CESAR ALEXEI CARRIZALES MAYORGA",
     lugar: "01",
@@ -254,6 +303,7 @@ const personalBase = [
   },
   {
     id: 2,
+    piso: 1,
     uid: "2",
     nombre: "DANIEL ENRIQUE VILLALPANDO CHÁVEZ",
     lugar: "04",
@@ -271,6 +321,7 @@ const personalBase = [
   },
   {
     id: 3,
+    piso: 1,
     uid: "3",
     nombre: "INES HERRERA GARCÍA",
     lugar: "04",
@@ -288,6 +339,7 @@ const personalBase = [
   },
   {
     id: 4,
+    piso: 1,
     uid: "4",
     nombre: "SUEMI MYRIAM VELAZQUEZ TORRES",
     lugar: "03",
@@ -305,6 +357,7 @@ const personalBase = [
   },
   {
     id: 5,
+    piso: 1,
     uid: "5",
     nombre: "CLAUDIA LORENA TOSCANO CHÁVEZ",
     lugar: "02",
@@ -322,6 +375,7 @@ const personalBase = [
   },
   {
     id: 6,
+    piso: 1,
     uid: "6",
     nombre: "NALLELY IRENE CABALLERO GUZMAN",
     lugar: "05",
@@ -339,6 +393,7 @@ const personalBase = [
   },
   {
     id: 7,
+    piso: 1,
     uid: "7",
     nombre: "LUCÍA ILEANA VILLALÓN TRUJILLO",
     lugar: "07",
@@ -356,6 +411,7 @@ const personalBase = [
   },
   {
     id: 8,
+    piso: 1,
     uid: "9",
     nombre: "HUMBERTO LEON PALOMINO",
     lugar: "31",
@@ -373,6 +429,7 @@ const personalBase = [
   },
   {
     id: 9,
+    piso: 6,
     uid: "10",
     nombre: "FERNANDO MENDOZA ELVIRA",
     lugar: "50",
@@ -390,6 +447,7 @@ const personalBase = [
   },
   {
     id: 10,
+    piso: 1,
     uid: "52",
     nombre: "TERESA VALENCIA FLORES",
     lugar: "05",
@@ -407,6 +465,7 @@ const personalBase = [
   },
   {
     id: 11,
+    piso: 6,
     uid: "48",
     nombre: "ANA MARIA GARDUÑO GARCIA",
     lugar: "51",
@@ -424,6 +483,7 @@ const personalBase = [
   },
   {
     id: 12,
+    piso: 6,
     uid: "49",
     nombre: "BRISA CELESTE MARQUEZ GONZALEZ",
     lugar: "53",
@@ -441,6 +501,7 @@ const personalBase = [
   },
   {
     id: 13,
+    piso: 6,
     uid: "50",
     nombre: "MARIO RAMIREZ ALVARADO",
     lugar: "52",
@@ -458,6 +519,7 @@ const personalBase = [
   },
   {
     id: 14,
+    piso: 6,
     uid: "64",
     nombre: "YENIFER STHEPHANIE MARTINEZ RIVERA",
     lugar: "Sala de juntas",
@@ -475,6 +537,7 @@ const personalBase = [
   },
   {
     id: 15,
+    piso: 6,
     uid: "65",
     nombre: "OSCAR VILLANUEVA OLIVARES",
     lugar: "51",
@@ -492,6 +555,7 @@ const personalBase = [
   },
   {
     id: 16,
+    piso: 6,
     uid: "66",
     nombre: "CARLOS ALBERTO ROJAS HEREDIA",
     lugar: "Sala de juntas",
@@ -509,6 +573,7 @@ const personalBase = [
   },
   {
     id: 17,
+    piso: 6,
     uid: "75",
     nombre: "VICENTA MIRYAM ROMAN NAVARRETE",
     lugar: "Sala de juntas",
@@ -526,6 +591,7 @@ const personalBase = [
   },
   {
     id: 18,
+    piso: 6,
     uid: "84",
     nombre: "EDGAR ALEJANDRO PÉREZ LUNA",
     lugar: "Sala de juntas",
@@ -543,6 +609,7 @@ const personalBase = [
   },
   {
     id: 19,
+    piso: 1,
     uid: "85",
     nombre: "GUSTAVO JIMÉNEZ MAYÉN",
     lugar: "Sala de juntas",
@@ -559,6 +626,7 @@ const personalBase = [
   },
   {
     id: 20,
+    piso: 1,
     uid: "86",
     nombre: "IVÁN RODRIGO OLLIVIER RIVERA",
     lugar: "Sala de juntas",
@@ -575,6 +643,7 @@ const personalBase = [
   },
   {
     id: 21,
+    piso: 1,
     uid: "8",
     nombre: "JOSÉ ALFONSO GARFIAS CORONA",
     lugar: "09",
@@ -592,6 +661,7 @@ const personalBase = [
   },
   {
     id: 22,
+    piso: 1,
     uid: "11",
     nombre: "ALEJANDRO TONATIUH GUZMAN MEDELLIN",
     lugar: "10",
@@ -609,6 +679,7 @@ const personalBase = [
   },
   {
     id: 23,
+    piso: 1,
     uid: "12",
     nombre: "LUIS DAVID ROMAN RUIZ",
     lugar: "08",
@@ -626,6 +697,7 @@ const personalBase = [
   },
   {
     id: 24,
+    piso: 1,
     uid: "16",
     nombre: "IVONNE ENRIQUETA REYES CARDENAS",
     lugar: "11",
@@ -643,6 +715,7 @@ const personalBase = [
   },
   {
     id: 25,
+    piso: 1,
     uid: "21",
     nombre: "MARTHA SUSANA HERNANDEZ RANGEL",
     lugar: "21",
@@ -660,6 +733,7 @@ const personalBase = [
   },
   {
     id: 26,
+    piso: 6,
     uid: "60",
     nombre: "ADRIAN PICHARDO LEYTE",
     lugar: "09",
@@ -677,6 +751,7 @@ const personalBase = [
   },
   {
     id: 27,
+    piso: 1,
     uid: "68",
     nombre: "VICTOR MANUEL SANCHEZ TAFOYA",
     lugar: "Sala de juntas",
@@ -694,6 +769,7 @@ const personalBase = [
   },
   {
     id: 28,
+    piso: 1,
     uid: "71",
     nombre: "RAUL ALAMEDA DE LA MORA",
     lugar: "Sala de juntas",
@@ -711,6 +787,7 @@ const personalBase = [
   },
   {
     id: 29,
+    piso: 6,
     uid: "76",
     nombre: "MARIO EMILIO SIGUIENZA CAMACHO",
     lugar: "Sala de juntas",
@@ -728,6 +805,7 @@ const personalBase = [
   },
   {
     id: 30,
+    piso: 1,
     uid: "79",
     nombre: "MARÍA KARINA SÁNCHEZ TORRES",
     lugar: "Sala de juntas",
@@ -745,6 +823,7 @@ const personalBase = [
   },
   {
     id: 31,
+    piso: 1,
     uid: "82",
     nombre: "NOHEMI RUIZ ANGELES",
     lugar: "Sala de juntas",
@@ -762,22 +841,24 @@ const personalBase = [
   },
   {
     id: 32,
+    piso: 6,
     uid: "87",
     nombre: "DIANA LAURA HERNÁNDEZ SANTAMARIA",
     lugar: "Sala de juntas",
     area: "DNAJ",
     nomina: "Ordinaria",
-    estatus: "Pendiente",
+    estatus: "Activo",
     adscripcion: "División de Procesos de Contratación",
     categoria: "Analista E1",
     matricula: "",
     carrera: "",
-    grupo: "pendiente",
+    grupo: "mapa",
     color: "#6A1B9A",
     ecolor: "#757575",
   },
   {
     id: 33,
+    piso: 1,
     uid: "29",
     nombre: "DIANA RAQUEL OLIVARES CARMONA",
     lugar: "33",
@@ -795,6 +876,7 @@ const personalBase = [
   },
   {
     id: 34,
+    piso: 6,
     uid: "30",
     nombre: "ALEJANDRO FONG SURIANO",
     lugar: "34",
@@ -812,6 +894,7 @@ const personalBase = [
   },
   {
     id: 35,
+    piso: 1,
     uid: "31",
     nombre: "CHRISTIAN PALOMINO GARCIA",
     lugar: "32",
@@ -829,6 +912,7 @@ const personalBase = [
   },
   {
     id: 36,
+    piso: 1,
     uid: "32",
     nombre: "FERNANDO MENDOZA AQUINO",
     lugar: "35",
@@ -846,6 +930,7 @@ const personalBase = [
   },
   {
     id: 37,
+    piso: 6,
     uid: "35",
     nombre: "JOSE REGULO LOPEZ ACEVES",
     lugar: "36",
@@ -863,6 +948,7 @@ const personalBase = [
   },
   {
     id: 38,
+    piso: 1,
     uid: "40",
     nombre: "JOSE LUIS DIAZ LARA",
     lugar: "43",
@@ -880,6 +966,7 @@ const personalBase = [
   },
   {
     id: 39,
+    piso: 1,
     uid: "58",
     nombre: "MIGUEL ANGEL GONZÁLEZ BAUTISTA",
     lugar: "Sala de juntas",
@@ -897,6 +984,7 @@ const personalBase = [
   },
   {
     id: 40,
+    piso: 6,
     uid: "59",
     nombre: "VANESSA PAULINA DE SANJUAN GONZÁLEZ",
     lugar: "32",
@@ -914,6 +1002,7 @@ const personalBase = [
   },
   {
     id: 41,
+    piso: 6,
     uid: "67",
     nombre: "PEDRO YAIR GOMEZ RIVERA",
     lugar: "Sala de juntas",
@@ -931,6 +1020,7 @@ const personalBase = [
   },
   {
     id: 42,
+    piso: 1,
     uid: "83",
     nombre: "MIGUEL ANGEL MONTOYA CHÁVEZ",
     lugar: "Sala de juntas",
@@ -948,6 +1038,7 @@ const personalBase = [
   },
   {
     id: 43,
+    piso: 1,
     uid: "91",
     nombre: "AMISADAI PAMELA CABALLERO LÓPEZ",
     lugar: "Sala de juntas",
@@ -965,6 +1056,7 @@ const personalBase = [
   },
   {
     id: 44,
+    piso: 6,
     uid: "22",
     nombre: "KARLA VAZQUEZ DEL ANGEL",
     lugar: "24",
@@ -982,6 +1074,7 @@ const personalBase = [
   },
   {
     id: 45,
+    piso: 1,
     uid: "24",
     nombre: "ENRIQUE JOEL BALTAZARES LUNA",
     lugar: "26",
@@ -999,6 +1092,7 @@ const personalBase = [
   },
   {
     id: 46,
+    piso: 1,
     uid: "25",
     nombre: "KARLA GABRIELA ISLAS ALONSO",
     lugar: "27",
@@ -1016,6 +1110,7 @@ const personalBase = [
   },
   {
     id: 47,
+    piso: 1,
     uid: "26",
     nombre: "ARACELI GARCIA GARCIA",
     lugar: "22",
@@ -1033,6 +1128,7 @@ const personalBase = [
   },
   {
     id: 48,
+    piso: 1,
     uid: "27",
     nombre: "LORENA RODRIGUEZ PANTOJA",
     lugar: "30",
@@ -1050,6 +1146,7 @@ const personalBase = [
   },
   {
     id: 49,
+    piso: 1,
     uid: "28",
     nombre: "ZAIRA LILIANA JIMENEZ SEADE",
     lugar: "23",
@@ -1067,6 +1164,7 @@ const personalBase = [
   },
   {
     id: 50,
+    piso: 1,
     uid: "55",
     nombre: "ESTEFANIA MONSERRAT RAMÍREZ SABIDO",
     lugar: "Sala de juntas",
@@ -1084,6 +1182,7 @@ const personalBase = [
   },
   {
     id: 51,
+    piso: 1,
     uid: "56",
     nombre: "AIDEÉ SUSANA GARCÍA AGUILAR",
     lugar: "Sala de juntas",
@@ -1101,6 +1200,7 @@ const personalBase = [
   },
   {
     id: 52,
+    piso: 1,
     uid: "57",
     nombre: "RUBÉN ISRAEL MARTÍNEZ MEDINA",
     lugar: "Sala de juntas",
@@ -1118,6 +1218,7 @@ const personalBase = [
   },
   {
     id: 53,
+    piso: 1,
     uid: "63",
     nombre: "CLAUDIA PAVÓN GÓMEZ",
     lugar: "Sala de juntas",
@@ -1135,6 +1236,7 @@ const personalBase = [
   },
   {
     id: 54,
+    piso: 6,
     uid: "70",
     nombre: "NAXHIELI BERENICE VALERIO LOPEZ",
     lugar: "Sala de juntas",
@@ -1151,24 +1253,8 @@ const personalBase = [
     foto: "NAXHIELI_BERENICE_VALERIO_LOPEZ.jpeg",
   },
   {
-    id: 55,
-    uid: "77",
-    nombre: "LESLIE ROMERO BARRIGA",
-    lugar: "Sala de juntas",
-    area: "DPC",
-    nomina: "Ordinaria",
-    estatus: "Nuevo ingreso 4to bloque",
-    adscripcion: "Subjefatura de División de Contratos y Convenios",
-    categoria: "Supervisor de Proyectos E1",
-    matricula: "311096119",
-    carrera: "Lic. en Economía",
-    grupo: "mapa",
-    color: "#E65100",
-    ecolor: "#757575",
-    foto: "LESLIE_GUADALUPE_ROMERO_BARRIGA.jpeg",
-  },
-  {
     id: 56,
+    piso: 6,
     uid: "33",
     nombre: "RICARDO ISRAEL QUINTANAR CARRILLO",
     lugar: "41",
@@ -1187,6 +1273,7 @@ const personalBase = [
   },
   {
     id: 57,
+    piso: 6,
     uid: "34",
     nombre: "GUILLERMINA JUAREZ CONTRERAS",
     lugar: "25",
@@ -1205,6 +1292,7 @@ const personalBase = [
   },
   {
     id: 58,
+    piso: 6,
     uid: "36",
     nombre: "BLANCA ESTELA GARCIA MACIAS",
     lugar: "37",
@@ -1223,6 +1311,7 @@ const personalBase = [
   },
   {
     id: 59,
+    piso: 6,
     uid: "37",
     nombre: "MARCO EMMANUEL MEDINA AMADOR",
     lugar: "39",
@@ -1241,6 +1330,7 @@ const personalBase = [
   },
   {
     id: 60,
+    piso: 6,
     uid: "38",
     nombre: "EDGAR CAMACHO ACOSTA",
     lugar: "40",
@@ -1259,6 +1349,7 @@ const personalBase = [
   },
   {
     id: 61,
+    piso: 6,
     uid: "39",
     nombre: "GEORGINA DE LA PAZ PANTOJA",
     lugar: "42",
@@ -1277,6 +1368,7 @@ const personalBase = [
   },
   {
     id: 62,
+    piso: 1,
     uid: "41",
     nombre: "KEVIN RUBEN MARQUEZ GONZALEZ",
     lugar: "44",
@@ -1295,6 +1387,7 @@ const personalBase = [
   },
   {
     id: 63,
+    piso: 1,
     uid: "73",
     nombre: "ROSENDO RENÉ REBOLLEDO MARQUEZ",
     lugar: "Sala de juntas",
@@ -1313,6 +1406,7 @@ const personalBase = [
   },
   {
     id: 64,
+    piso: 6,
     uid: "89",
     nombre: "XOCHITL SALGADO FLORES",
     lugar: "Sala de juntas",
@@ -1331,6 +1425,7 @@ const personalBase = [
   },
   {
     id: 65,
+    piso: 1,
     uid: "13",
     nombre: "SAUL GONZALEZ MARTINEZ",
     lugar: "13",
@@ -1348,6 +1443,7 @@ const personalBase = [
   },
   {
     id: 66,
+    piso: 1,
     uid: "14",
     nombre: "SANTANA ALFONSO VALDES BADILLO",
     lugar: "17",
@@ -1365,6 +1461,7 @@ const personalBase = [
   },
   {
     id: 67,
+    piso: 1,
     uid: "15",
     nombre: "TANIA ESTEFANIA GUTIERREZ CASTRUITA",
     lugar: "18",
@@ -1382,6 +1479,7 @@ const personalBase = [
   },
   {
     id: 68,
+    piso: 1,
     uid: "17",
     nombre: "ALICIA CAMPOS CABALLERO",
     lugar: "16",
@@ -1399,6 +1497,7 @@ const personalBase = [
   },
   {
     id: 69,
+    piso: 1,
     uid: "18",
     nombre: "ERIK ALFREDO GAONA REYES",
     lugar: "14",
@@ -1416,6 +1515,7 @@ const personalBase = [
   },
   {
     id: 70,
+    piso: 1,
     uid: "19",
     nombre: "RAFAEL PEREZ FIGUEROA",
     lugar: "15",
@@ -1433,6 +1533,7 @@ const personalBase = [
   },
   {
     id: 71,
+    piso: 1,
     uid: "20",
     nombre: "ALEJANDRO MORALES MADRIGAL",
     lugar: "19",
@@ -1450,6 +1551,7 @@ const personalBase = [
   },
   {
     id: 72,
+    piso: 1,
     uid: "23",
     nombre: "CINTHYA MILER SALINAS",
     lugar: "20",
@@ -1467,6 +1569,7 @@ const personalBase = [
   },
   {
     id: 73,
+    piso: 1,
     uid: "51",
     nombre: "JOSE RAMON RAMIREZ GOROSTIZA",
     lugar: "28",
@@ -1484,6 +1587,7 @@ const personalBase = [
   },
   {
     id: 74,
+    piso: 1,
     uid: "53",
     nombre: "ROBERTO RICARDEZ MENDOZA",
     lugar: "46",
@@ -1501,6 +1605,7 @@ const personalBase = [
   },
   {
     id: 75,
+    piso: 1,
     uid: "54",
     nombre: "RUEL ALEJANDRO LEYVA PAREDES",
     lugar: "38",
@@ -1518,6 +1623,7 @@ const personalBase = [
   },
   {
     id: 76,
+    piso: 6,
     uid: "61",
     nombre: "MAYRA LUZ AMBROCIO MÉNDEZ",
     lugar: "Sala de juntas",
@@ -1535,6 +1641,7 @@ const personalBase = [
   },
   {
     id: 77,
+    piso: 6,
     uid: "62",
     nombre: "GUILLERMO MANRIQUE FERNANDEZ",
     lugar: "Sala de juntas",
@@ -1552,6 +1659,7 @@ const personalBase = [
   },
   {
     id: 78,
+    piso: 1,
     uid: "69",
     nombre: "MARIANA CRUZ FRAGOSO",
     lugar: "Sala de juntas",
@@ -1569,6 +1677,7 @@ const personalBase = [
   },
   {
     id: 79,
+    piso: 6,
     uid: "72",
     nombre: "JESSICA MAQUEDA RAMOS",
     lugar: "Sala de juntas",
@@ -1586,6 +1695,7 @@ const personalBase = [
   },
   {
     id: 80,
+    piso: 6,
     uid: "74",
     nombre: "MARCOS RODRIGO MALDONADO LOPEZ",
     lugar: "Sala de juntas",
@@ -1603,6 +1713,7 @@ const personalBase = [
   },
   {
     id: 81,
+    piso: 6,
     uid: "80",
     nombre: "BERENICE ALEJANDRA GARCÍA OROZCO",
     lugar: "Sala de juntas",
@@ -1620,22 +1731,24 @@ const personalBase = [
   },
   {
     id: 82,
+    piso: 1,
     uid: "88",
     nombre: "VERÓNICA NOEMI NOGUERÓN SAN MIGUEL",
     lugar: "Sala de juntas",
     area: "DPC",
     nomina: "Ordinaria",
-    estatus: "Pendiente",
+    estatus: "Activo",
     adscripcion: "Subjefatura de División de Procedimientos de Contratación",
     categoria: "Analista E1",
     matricula: "",
     carrera: "",
-    grupo: "pendiente",
+    grupo: "mapa",
     color: "#E65100",
     ecolor: "#757575",
   },
   {
     id: 83,
+    piso: 1,
     uid: "90",
     nombre: "ALEXA NAIAN PALENCIA FERNÁNDEZ",
     lugar: "Sala de juntas",
@@ -1653,6 +1766,7 @@ const personalBase = [
   },
   {
     id: 84,
+    piso: 1,
     uid: "42",
     nombre: "LILIANA ELIZABETH RAMOS ROLDAN",
     lugar: "45",
@@ -1670,6 +1784,7 @@ const personalBase = [
   },
   {
     id: 85,
+    piso: 6,
     uid: "43",
     nombre: "JOSE ARMANDO ZAMUDIO CAMARILLO",
     lugar: "chofer",
@@ -1687,6 +1802,7 @@ const personalBase = [
   },
   {
     id: 86,
+    piso: 1,
     uid: "44",
     nombre: "ALFONSO ALVARADO RAYA",
     lugar: "47",
@@ -1704,6 +1820,7 @@ const personalBase = [
   },
   {
     id: 87,
+    piso: 1,
     uid: "45",
     nombre: "JULIETA DEL CONSUELO ROJAS PEÑA",
     lugar: "48",
@@ -1721,6 +1838,7 @@ const personalBase = [
   },
   {
     id: 88,
+    piso: 1,
     uid: "46",
     nombre: "JUAN PEDRO ESPINOZA CASTELLANOS",
     lugar: "49",
@@ -1738,6 +1856,7 @@ const personalBase = [
   },
   {
     id: 89,
+    piso: 1,
     uid: "92",
     nombre: "JULIO CÉSAR TELLEZ GUERRERO",
     lugar: "16",
@@ -1754,6 +1873,7 @@ const personalBase = [
   },
   {
     id: 90,
+    piso: 1,
     uid: "93",
     nombre: "JULIA ANAHI MIRANDA ESPINOSA",
     lugar: "04",
@@ -1767,6 +1887,40 @@ const personalBase = [
     grupo: "mapa",
     color: "#1565C0",
     ecolor: "#1565C0",
+  },
+  {
+    id: 91,
+    piso: 1,
+    uid: "94",
+    nombre: "Titular de la Subjefatura de División de Transparencia y Certificación",
+    lugar: "",
+    area: "DSAA",
+    nomina: "Mando",
+    estatus: "Pendiente",
+    adscripcion: "Subjefatura de División de Transparencia y Certificación",
+    categoria: "",
+    matricula: "",
+    carrera: "",
+    grupo: "pendiente",
+    color: "#2E7D32",
+    ecolor: "#757575",
+  },
+  {
+    id: 92,
+    piso: 1,
+    uid: "95",
+    nombre: "ROSA MARÍA RODRÍGUEZ PADRÓN",
+    lugar: "",
+    area: "DSAA",
+    nomina: "Ordinaria",
+    estatus: "Activo",
+    adscripcion: "ccops",
+    categoria: "Auxiliar Técnico E2",
+    matricula: "311096172",
+    carrera: "",
+    grupo: "mapa",
+    color: "#2E7D32",
+    ecolor: "#757575",
   },
 ]; // ← pega aquí tu array de objetos sin x/y
 
@@ -1854,7 +2008,10 @@ function buildOrgLayout(list) {
 // ─────────────────────────────────────────────
 let devices = [];
 let currentLayout = null; // 'horizontal' | 'vertical'
+let currentFloor = 1;     // 1 | 6
 let locateMode = false, orgMode = false, activeId = null, pendOpen = false, toastTimer;
+let assignMode = false, proposalMode = false;
+let officialPositions = {}; // snapshot {id:{x,y}} del plano oficial cargado (piso+layout actuales)
 
 // Referencias DOM
 const layer    = document.getElementById('pins-layer');
@@ -1910,41 +2067,63 @@ function detectLayout() {
 // ─────────────────────────────────────────────
 //  CARGA DE RECURSOS (imagen + coords JSON)
 // ─────────────────────────────────────────────
-async function loadLayout(layout) {
-  if (layout === currentLayout) return;
+async function loadLayout(layout, floor) {
+  floor = floor ?? currentFloor;
+  if (layout === currentLayout && floor === currentFloor && devices.length) return;
   currentLayout = layout;
+  currentFloor = floor;
 
   showLoading(true);
   panel.style.display = 'none';
 
+  const floorCfg = CONFIG.floors[floor];
+
   try {
     const [coordsData] = await Promise.all([
-      fetch(CONFIG.coords[layout]).then(r => {
-        if (!r.ok) throw new Error(`No se pudo cargar ${CONFIG.coords[layout]}`);
-        return r.json();
-      }),
+      fetch(floorCfg.coords[layout])
+        .then(r => r.ok ? r.json() : [])
+        .catch(() => []),
       new Promise((resolve, reject) => {
         img.onload  = resolve;
-        img.onerror = () => reject(new Error(`No se pudo cargar ${CONFIG.img[layout]}`));
-        img.src = CONFIG.img[layout];
+        img.onerror = () => reject(new Error(`No se pudo cargar ${floorCfg.img[layout]}`));
+        img.src = floorCfg.img[layout];
       })
     ]);
 
     const coordsMap = {};
     coordsData.forEach(c => { coordsMap[c.id] = { x: c.x, y: c.y }; });
 
+    // Snapshot oficial — el organigrama sigue usando TODO personalBase sin filtrar por piso.
+    // Quien no tenga coordenadas en el JSON del piso activo se reparte en cuadrícula
+    // (en vez de apilarse en el centro) para poder arrastrarlo fácilmente.
+    officialPositions = {};
+    const sinCoords = [];
+    personalBase.forEach(d => {
+      if (coordsMap[d.id]) officialPositions[d.id] = { x: coordsMap[d.id].x, y: coordsMap[d.id].y };
+      else sinCoords.push(d);
+    });
+    const sinCoordsEsteFloor = sinCoords.filter(d => d.grupo === 'mapa' && (floor === 1 || d.piso === floor));
+    const cols = 8, spX = 11, spY = 12, startX = 8, startY = 10;
+    sinCoordsEsteFloor.forEach((d, i) => {
+      officialPositions[d.id] = { x: startX + (i % cols) * spX, y: startY + Math.floor(i / cols) * spY };
+    });
+    sinCoords.forEach(d => { if (!officialPositions[d.id]) officialPositions[d.id] = { x: 50, y: 50 }; });
+
     devices = personalBase.map(d => ({
       ...d,
-      x: coordsMap[d.id]?.x ?? d.x ?? 50,
-      y: coordsMap[d.id]?.y ?? d.y ?? 50
+      x: officialPositions[d.id].x,
+      y: officialPositions[d.id].y
     }));
 
-    buildOrgLayout(devices);
+    buildOrgLayout(devices); // organigrama: siempre con todos, sin importar el piso activo
 
     layoutInd.className = 'layout-indicator ' + layout;
-    layoutLbl.textContent = layout === 'horizontal' ? '🖥 PC' : '📱 Móvil';
+    layoutLbl.textContent = (layout === 'horizontal' ? '🖥 PC' : '📱 Móvil') + ' · Piso ' + floor;
 
-    initPins();
+    if (proposalMode) applyProposal(); else initPins();
+    if (!coordsData.length && devices.some(d => d.piso === floor && d.grupo === 'mapa')) {
+      showToast(`Piso ${floor} sin coordenadas aún — arrastra los pines para ubicarlos`);
+    }
   } catch (err) {
     showToast('⚠ Error al cargar: ' + err.message);
     console.error(err);
@@ -1952,6 +2131,53 @@ async function loadLayout(layout) {
     showLoading(false);
   }
 }
+
+// ─────────────────────────────────────────────
+//  PROPUESTA — posiciones en localStorage, no toca
+//  el plano oficial ni el organigrama.
+// ─────────────────────────────────────────────
+function proposalKey() { return `propuesta_piso${currentFloor}_${currentLayout}`; }
+
+function applyProposal() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(proposalKey()) || '{}'); } catch (e) { saved = {}; }
+  devices = personalBase.map(d => ({
+    ...d,
+    x: saved[d.id]?.x ?? officialPositions[d.id].x,
+    y: saved[d.id]?.y ?? officialPositions[d.id].y
+  }));
+  buildOrgLayout(devices);
+  initPins();
+}
+
+function saveProposalPosition(d) {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(proposalKey()) || '{}'); } catch (e) { saved = {}; }
+  saved[d.id] = { x: +d.x.toFixed(2), y: +d.y.toFixed(2) };
+  localStorage.setItem(proposalKey(), JSON.stringify(saved));
+}
+
+document.getElementById('proposal-btn').addEventListener('click', () => {
+  if (orgMode) { showToast('Sal del organigrama para usar Propuesta'); return; }
+  proposalMode = !proposalMode;
+  document.getElementById('proposal-btn').classList.toggle('active', proposalMode);
+  document.getElementById('proposal-banner').classList.toggle('active', proposalMode);
+  if (proposalMode) {
+    applyProposal();
+    showToast('📌 Modo propuesta activo — arrastra libremente');
+  } else {
+    devices = personalBase.map(d => ({ ...d, x: officialPositions[d.id].x, y: officialPositions[d.id].y }));
+    buildOrgLayout(devices);
+    initPins();
+    showToast('Modo propuesta desactivado — volviste al plano oficial');
+  }
+});
+
+document.getElementById('proposal-discard-btn').addEventListener('click', () => {
+  localStorage.removeItem(proposalKey());
+  showToast('🗑 Propuesta descartada para Piso ' + currentFloor + ' (' + currentLayout + ')');
+  if (proposalMode) applyProposal();
+});
 
 function showLoading(visible) {
   overlay.classList.toggle('hidden', !visible);
@@ -1966,7 +2192,7 @@ function onLayoutChange() {
   resizeTimer = setTimeout(() => {
     const newLayout = detectLayout();
     if (newLayout !== currentLayout) {
-      loadLayout(newLayout);
+      loadLayout(newLayout, currentFloor);
     }
   }, 200);
 }
@@ -1981,7 +2207,8 @@ window.addEventListener('resize', onLayoutChange);
 // ─────────────────────────────────────────────
 function initPins() {
   layer.innerHTML = '';
-  devices.filter(d => d.grupo === 'mapa').forEach(d => {
+  const verTodos = currentFloor === 1 && !proposalMode; // realidad actual: solo fuera de Propuesta
+  devices.filter(d => d.grupo === 'mapa' && (orgMode || verTodos || d.piso === currentFloor)).forEach(d => {
     const pin = document.createElement('div');
     pin.className = 'pin'; pin.dataset.id = d.id; pin.dataset.area = d.area;
     const px = orgMode ? d.orgX : d.x, py = orgMode ? d.orgY : d.y;
@@ -1991,9 +2218,20 @@ function initPins() {
     const p = d.nombre.trim().split(' ');
     c.textContent = (p[0]?.[0] || '').toUpperCase() + (p[1]?.[0] || '').toUpperCase();
     pin.appendChild(c);
+    if (d.piso === 6) {
+      const badge = document.createElement('div');
+      badge.className = 'pin-floor-badge'; badge.textContent = '6';
+      badge.title = 'Piso 6';
+      pin.appendChild(badge);
+    }
     pin.addEventListener('mouseenter', () => showTooltip(pin, d));
     pin.addEventListener('mouseleave', hideTooltip);
-    pin.addEventListener('click', e => { if (!locateMode) { e.stopPropagation(); showPanel(d.id); } });
+    pin.addEventListener('click', e => {
+      if (locateMode) return;
+      e.stopPropagation();
+      if (assignMode) { toggleFloorAssignment(d); return; }
+      showPanel(d.id);
+    });
     makeDraggable(pin, d);
     layer.appendChild(pin);
   });
@@ -2001,31 +2239,97 @@ function initPins() {
 }
 
 // ─────────────────────────────────────────────
+//  ASIGNAR PISO — reasigna personas entre Piso 1 y Piso 6
+//  (no afecta el organigrama, que sigue mostrando a todos)
+// ─────────────────────────────────────────────
+function toggleFloorAssignment(d) {
+  const nuevoPiso = d.piso === 1 ? 6 : 1;
+  const base = personalBase.find(p => p.id === d.id);
+  if (base) base.piso = nuevoPiso;
+  d.piso = nuevoPiso;
+  showToast(`${d.nombre.split(' ')[0]} → Piso ${nuevoPiso}`);
+  initPins();
+  buildTrasladosPanel();
+}
+
+// ─────────────────────────────────────────────
+//  PANEL TRASLADOS — mientras "Asignar piso" está activo,
+//  muestra quién quedó en el OTRO piso (clic para regresarlo).
+// ─────────────────────────────────────────────
+function buildTrasladosPanel() {
+  const otroPiso = currentFloor === 1 ? 6 : 1;
+  const trasladados = personalBase.filter(p => p.grupo === 'mapa' && p.piso === otroPiso);
+  document.getElementById('traslados-subtitle').textContent = `a Piso ${otroPiso} (${trasladados.length})`;
+  const list = document.getElementById('traslados-list');
+  const empty = document.getElementById('traslados-empty');
+  list.innerHTML = '';
+  empty.style.display = trasladados.length ? 'none' : 'block';
+  trasladados.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'traslado-card';
+    card.innerHTML = `<div class="traslado-card-nombre">${d.nombre}</div>
+      <div class="traslado-card-sub">${d.area || '—'} · ${d.adscripcion || '—'}</div>
+      <div class="traslado-card-back">↩ Clic para regresar a Piso ${currentFloor}</div>`;
+    card.addEventListener('click', () => toggleFloorAssignment(d));
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('assign-floor-btn').addEventListener('click', () => {
+  if (orgMode) { showToast('Sal del organigrama para asignar pisos'); return; }
+  assignMode = !assignMode;
+  document.getElementById('assign-floor-btn').classList.toggle('active', assignMode);
+  document.getElementById('traslados-panel').classList.toggle('open', assignMode);
+  if (assignMode) buildTrasladosPanel();
+  showToast(assignMode ? '🔀 Modo asignar piso — clic en un pin para moverlo de piso' : 'Modo asignar piso desactivado');
+});
+
+document.querySelectorAll('.floor-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (orgMode) { showToast('Sal del organigrama para cambiar de piso'); return; }
+    document.querySelectorAll('.floor-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadLayout(currentLayout, +btn.dataset.floor).then(() => { if (assignMode) buildTrasladosPanel(); });
+  });
+});
+
+// ─────────────────────────────────────────────
 //  TOGGLE ORGANIGRAMA
 // ─────────────────────────────────────────────
 orgBtn.addEventListener('click', () => {
   hideTooltip();
   if (locateMode) modeBtn.click();
+  if (assignMode) {
+    assignMode = false;
+    document.getElementById('assign-floor-btn').classList.remove('active');
+    document.getElementById('traslados-panel').classList.remove('open');
+  }
+  if (proposalMode) {
+    proposalMode = false;
+    document.getElementById('proposal-btn').classList.remove('active');
+    document.getElementById('proposal-banner').classList.remove('active');
+    devices = personalBase.map(d => ({ ...d, x: officialPositions[d.id].x, y: officialPositions[d.id].y }));
+  }
   orgMode = !orgMode;
   orgBtn.classList.toggle('active', orgMode);
   panel.style.display = 'none';
 
-  const pins = document.querySelectorAll('.pin');
-  pins.forEach(p => p.classList.add('org-anim'));
   img.classList.toggle('faded', orgMode);
 
   if (orgMode) {
     linesLayer.innerHTML = '';
-    positionAllPins();
+    initPins();
+    document.querySelectorAll('.pin').forEach(p => p.classList.add('org-anim'));
     updateOrgZoom();
     setTimeout(drawOrgLines, 680);
   } else {
     linesLayer.style.opacity = '0';
     setTimeout(() => { linesLayer.innerHTML = ''; linesLayer.style.opacity = '1'; }, 350);
-    positionAllPins();
+    initPins();
+    document.querySelectorAll('.pin').forEach(p => p.classList.add('org-anim'));
     updateOrgZoom();
   }
-  setTimeout(() => pins.forEach(p => p.classList.remove('org-anim')), 900);
+  setTimeout(() => document.querySelectorAll('.pin').forEach(p => p.classList.remove('org-anim')), 900);
 });
 
 function drawOrgLines() {
@@ -2105,7 +2409,7 @@ function showPanelData(d) {
   const badge = document.getElementById('panel-badge');
   badge.textContent = d.estatus; badge.style.background = d.ecolor;
   const rows = document.getElementById('p-rows'); rows.innerHTML = '';
-  const fields = [['Lugar', d.lugar], ['Área', d.area || '—'], ['Adscripción', d.adscripcion || '—'], ['Nómina', d.nomina || '—'], ['Categoría', d.categoria || '—']];
+  const fields = [['Piso', d.piso || '—'], ['Lugar', d.lugar], ['Área', d.area || '—'], ['Adscripción', d.adscripcion || '—'], ['Nómina', d.nomina || '—'], ['Categoría', d.categoria || '—']];
   if (d.matricula) fields.push(['Matrícula', d.matricula]);
   fields.forEach(([l, v]) => {
     const r = document.createElement('div'); r.className = 'info-row';
@@ -2140,7 +2444,7 @@ document.getElementById('pendientes-btn').addEventListener('click', () => {
 function makeDraggable(pin, d) {
   let dragging = false, startX, startY;
   pin.addEventListener('mousedown', e => {
-    if (locateMode || orgMode) return; e.preventDefault(); dragging = false; startX = e.clientX; startY = e.clientY;
+    if (locateMode || orgMode || assignMode) return; e.preventDefault(); dragging = false; startX = e.clientX; startY = e.clientY;
     const onMove = mv => {
       if (!dragging && Math.hypot(mv.clientX - startX, mv.clientY - startY) > 4) { dragging = true; pin.classList.add('drag-active'); }
       if (!dragging) return;
@@ -2153,8 +2457,16 @@ function makeDraggable(pin, d) {
     const onUp = () => {
       window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp);
       pin.classList.remove('drag-active');
-      if (dragging) showToast(`${d.nombre.split(' ')[0]} → x:${d.x.toFixed(1)} y:${d.y.toFixed(1)}`);
-      else showPanel(d.id); dragging = false;
+      if (dragging) {
+        if (proposalMode) {
+          saveProposalPosition(d);
+          showToast(`📌 Propuesta: ${d.nombre.split(' ')[0]} → x:${d.x.toFixed(1)} y:${d.y.toFixed(1)}`);
+        } else {
+          showToast(`${d.nombre.split(' ')[0]} → x:${d.x.toFixed(1)} y:${d.y.toFixed(1)}`);
+        }
+      }
+      else showPanel(d.id);
+      dragging = false;
     };
     window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
   });
@@ -2182,8 +2494,17 @@ mapWrap.addEventListener('click', e => {
 //  EXPORTAR — incluye el layout activo en el nombre
 // ─────────────────────────────────────────────
 document.getElementById('export-btn').addEventListener('click', () => {
-  const out = devices.map(d => ({ id: d.id, uid: d.uid, nombre: d.nombre, x: +d.x.toFixed(2), y: +d.y.toFixed(2) }));
-  const filename = `posiciones_personal_${currentLayout}.json`;
+  let out, filename;
+  if (assignMode) {
+    out = personalBase.map(d => ({ id: d.id, uid: d.uid, nombre: d.nombre, piso: d.piso }));
+    filename = `asignacion_pisos.json`;
+  } else {
+    const verTodosExp = currentFloor === 1 && !proposalMode;
+    out = devices.filter(d => orgMode || verTodosExp || d.piso === currentFloor)
+      .map(d => ({ id: d.id, uid: d.uid, nombre: d.nombre, x: +d.x.toFixed(2), y: +d.y.toFixed(2) }));
+    const prefix = proposalMode ? 'propuesta' : 'posiciones_personal';
+    filename = `${prefix}_piso${currentFloor}_${currentLayout}.json`;
+  }
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' }));
   a.download = filename; a.click();
@@ -2232,8 +2553,10 @@ function applyFilters() {
 
 function updateCounts() {
   const c = {};
-  devices.filter(d => d.grupo === 'mapa').forEach(d => { c[d.area] = (c[d.area] || 0) + 1; });
-  document.getElementById('cnt-all').textContent = devices.filter(d => d.grupo === 'mapa').length;
+  const verTodosCnt = currentFloor === 1 && !proposalMode;
+  const scope = devices.filter(d => d.grupo === 'mapa' && (orgMode || verTodosCnt || d.piso === currentFloor));
+  scope.forEach(d => { c[d.area] = (c[d.area] || 0) + 1; });
+  document.getElementById('cnt-all').textContent = scope.length;
   document.getElementById('cnt-ccops').textContent = c['CCOPS'] || 0;
   document.getElementById('cnt-dpc').textContent = c['DPC'] || 0;
   document.getElementById('cnt-dsaa').textContent = c['DSAA'] || 0;
