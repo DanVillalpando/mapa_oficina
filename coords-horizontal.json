@@ -220,8 +220,8 @@
     "id": 32,
     "uid": "87",
     "nombre": "DIANA LAURA HERNÁNDEZ SANTAMARIA",
-    "x": 128,
-    "y": 22
+    "x": 36.01,
+    "y": 26.53
   },
   {
     "id": 33,
@@ -376,13 +376,6 @@
     "nombre": "NAXHIELI BERENICE VALERIO LOPEZ",
     "x": 43.23,
     "y": 13.46
-  },
-  {
-    "id": 55,
-    "uid": "77",
-    "nombre": "LESLIE ROMERO BARRIGA",
-    "x": 32.94,
-    "y": 49.62
   },
   {
     "id": 56,
@@ -570,8 +563,8 @@
     "id": 82,
     "uid": "88",
     "nombre": "VERÓNICA NOEMI NOGUERÓN SAN MIGUEL",
-    "x": 128,
-    "y": 36
+    "x": 36.14,
+    "y": 37.97
   },
   {
     "id": 83,
@@ -628,5 +621,19 @@
     "nombre": "JULIA ANAHI MIRANDA ESPINOSA",
     "x": 59.18,
     "y": 60.74
+  },
+  {
+    "id": 91,
+    "uid": "94",
+    "nombre": "Titular de la Subjefatura de División de Transparencia y Certificación",
+    "x": 50,
+    "y": 50
+  },
+  {
+    "id": 92,
+    "uid": "95",
+    "nombre": "ROSA MARÍA RODRÍGUEZ PADRÓN",
+    "x": 36.34,
+    "y": 43.04
   }
 ]
