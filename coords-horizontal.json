@@ -129,15 +129,15 @@
     "id": 19,
     "uid": "85",
     "nombre": "GUSTAVO JIMÉNEZ MAYÉN",
-    "x": 116,
-    "y": 15
+    "x": 12.16, 
+    "y": 24.45
   },
   {
     "id": 20,
     "uid": "86",
     "nombre": "IVÁN RODRIGO OLLIVIER RIVERA",
-    "x": 122,
-    "y": 15
+    "x": 12.22,
+    "y": 19.77
   },
   {
     "id": 21,
@@ -269,8 +269,8 @@
     "id": 39,
     "uid": "58",
     "nombre": "MIGUEL ANGEL GONZÁLEZ BAUTISTA",
-    "x": 44.6,
-    "y": 86.47
+    "x": 22.94, 
+    "y": 49.54
   },
   {
     "id": 40,
@@ -353,15 +353,15 @@
     "id": 51,
     "uid": "56",
     "nombre": "AIDEÉ SUSANA GARCÍA AGUILAR",
-    "x": 34.83,
-    "y": 40.75
+    "x": 33.99,
+    "y": 67.88
   },
   {
     "id": 52,
     "uid": "57",
     "nombre": "RUBÉN ISRAEL MARTÍNEZ MEDINA",
-    "x": 34.64,
-    "y": 35.71
+    "x": 34.84,
+    "y": 72.17
   },
   {
     "id": 53,
@@ -542,8 +542,8 @@
     "id": 79,
     "uid": "72",
     "nombre": "JESSICA MAQUEDA RAMOS",
-    "x": 45.12,
-    "y": 18.32
+    "x": 33.07,
+    "y": 72.17
   },
   {
     "id": 80,
@@ -626,8 +626,8 @@
     "id": 91,
     "uid": "94",
     "nombre": "Titular de la Subjefatura de División de Transparencia y Certificación",
-    "x": 50,
-    "y": 50
+    "x": 12.22,
+    "y": 28.74
   },
   {
     "id": 92,
@@ -635,5 +635,12 @@
     "nombre": "ROSA MARÍA RODRÍGUEZ PADRÓN",
     "x": 36.34,
     "y": 43.04
+  },
+  {
+    "id": 92,
+    "uid": "95",
+    "nombre": "ARLETH SÁNCHEZ FRANCO",
+    "x": 39.74, 
+    "y": 80.62
   }
 ]
