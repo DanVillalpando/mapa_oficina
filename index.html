@@ -620,8 +620,8 @@ const personalBase = [
     categoria: "Supervisor de Proyectos E1",
     matricula: "",
     carrera: "",
-    grupo: "pendiente",
-    color: "#6A1B9A",
+    grupo: "mapa",
+    color: "#757575",
     ecolor: "#757575",
   },
   {
@@ -637,8 +637,8 @@ const personalBase = [
     categoria: "Supervisor de Proyectos E1",
     matricula: "",
     carrera: "",
-    grupo: "pendiente",
-    color: "#6A1B9A",
+    grupo: "mapa",
+    color: "#757575",
     ecolor: "#757575",
   },
   {
@@ -1044,7 +1044,7 @@ const personalBase = [
     lugar: "Sala de juntas",
     area: "DSAA",
     nomina: "Ordinaria",
-    estatus: "Pendiente",
+    estatus: "Activo",
     adscripcion: "División de Seguimiento y Atención a Auditorias",
     categoria: "Analista E1",
     matricula: "",
@@ -1901,8 +1901,8 @@ const personalBase = [
     categoria: "",
     matricula: "",
     carrera: "",
-    grupo: "pendiente",
-    color: "#2E7D32",
+    grupo: "mapa",
+    color: "#757575",
     ecolor: "#757575",
   },
   {
@@ -1921,6 +1921,23 @@ const personalBase = [
     grupo: "mapa",
     color: "#2E7D32",
     ecolor: "#757575",
+  },
+  {
+    id: 93,
+    piso: 1,
+    uid: "96",
+    nombre: "ARLETH SÁNCHEZ FRANCO",
+    lugar: "",
+    area: "DSAA",
+    nomina: "-",
+    estatus: "Servicio Social",
+    adscripcion: "ccops",
+    categoria: "Servicio Social",
+    matricula: "",
+    carrera: "Lic. en Contaduría",
+    grupo: "mapa",
+    color: "#2E7D32",
+    ecolor: "#2E7D32",
   },
 ]; // ← pega aquí tu array de objetos sin x/y
 
@@ -2384,7 +2401,7 @@ function updateOrgZoom() {
 function buildPendientesPanel() {
   const list = document.getElementById('pendientes-list');
   list.innerHTML = '';
-  const pending = devices.filter(d => d.grupo === 'pendiente');
+  const pending = devices.filter(d => d.estatus === 'Pendiente');
   document.getElementById('pendientes-badge').textContent = pending.length;
   document.getElementById('pend-subtitle').textContent = `— ${pending.length} personas`;
   pending.forEach(d => {
