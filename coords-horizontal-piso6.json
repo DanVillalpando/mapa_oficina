@@ -1,0 +1,303 @@
+[
+  {
+    "id": 8,
+    "uid": "9",
+    "nombre": "HUMBERTO LEON PALOMINO",
+    "x": 79.23,
+    "y": 15.81
+  },
+  {
+    "id": 9,
+    "uid": "10",
+    "nombre": "FERNANDO MENDOZA ELVIRA",
+    "x": 23.63,
+    "y": 14.01
+  },
+  {
+    "id": 11,
+    "uid": "48",
+    "nombre": "ANA MARIA GARDUÑO GARCIA",
+    "x": 19.53,
+    "y": 30.41
+  },
+  {
+    "id": 12,
+    "uid": "49",
+    "nombre": "BRISA CELESTE MARQUEZ GONZALEZ",
+    "x": 27.67,
+    "y": 32.71
+  },
+  {
+    "id": 13,
+    "uid": "50",
+    "nombre": "MARIO RAMIREZ ALVARADO",
+    "x": 38.28,
+    "y": 38.78
+  },
+  {
+    "id": 14,
+    "uid": "64",
+    "nombre": "YENIFER STHEPHANIE MARTINEZ RIVERA",
+    "x": 30.73,
+    "y": 44.03
+  },
+  {
+    "id": 15,
+    "uid": "65",
+    "nombre": "OSCAR VILLANUEVA OLIVARES",
+    "x": 20.12,
+    "y": 52.89
+  },
+  {
+    "id": 16,
+    "uid": "66",
+    "nombre": "CARLOS ALBERTO ROJAS HEREDIA",
+    "x": 27.34,
+    "y": 44.52
+  },
+  {
+    "id": 17,
+    "uid": "75",
+    "nombre": "VICENTA MIRYAM ROMAN NAVARRETE",
+    "x": 18.03,
+    "y": 53.71
+  },
+  {
+    "id": 18,
+    "uid": "84",
+    "nombre": "EDGAR ALEJANDRO PÉREZ LUNA",
+    "x": 19.47,
+    "y": 41.73
+  },
+  {
+    "id": 19,
+    "uid": "85",
+    "nombre": "GUSTAVO JIMÉNEZ MAYÉN",
+    "x": 41.93,
+    "y": 38.94
+  },
+  {
+    "id": 20,
+    "uid": "86",
+    "nombre": "IVÁN RODRIGO OLLIVIER RIVERA",
+    "x": 38.67,
+    "y": 47.31
+  },
+  {
+    "id": 32,
+    "uid": "87",
+    "nombre": "DIANA LAURA HERNÁNDEZ SANTAMARIA",
+    "x": 0,
+    "y": 0
+  },
+  {
+    "id": 33,
+    "uid": "29",
+    "nombre": "DIANA RAQUEL OLIVARES CARMONA",
+    "x": 73.44,
+    "y": 34.68
+  },
+  {
+    "id": 34,
+    "uid": "30",
+    "nombre": "ALEJANDRO FONG SURIANO",
+    "x": 48.5,
+    "y": 39.6
+  },
+  {
+    "id": 35,
+    "uid": "31",
+    "nombre": "CHRISTIAN PALOMINO GARCIA",
+    "x": 48.37,
+    "y": 14.17
+  },
+  {
+    "id": 36,
+    "uid": "32",
+    "nombre": "FERNANDO MENDOZA AQUINO",
+    "x": 79.82,
+    "y": 31.4
+  },
+  {
+    "id": 37,
+    "uid": "35",
+    "nombre": "JOSE REGULO LOPEZ ACEVES",
+    "x": 53.97,
+    "y": 16.47
+  },
+  {
+    "id": 38,
+    "uid": "40",
+    "nombre": "JOSE LUIS DIAZ LARA",
+    "x": 80.21,
+    "y": 51.08
+  },
+  {
+    "id": 39,
+    "uid": "58",
+    "nombre": "MIGUEL ANGEL GONZÁLEZ BAUTISTA",
+    "x": 65.43,
+    "y": 86.52
+  },
+  {
+    "id": 40,
+    "uid": "59",
+    "nombre": "VANESSA PAULINA DE SANJUAN GONZÁLEZ",
+    "x": 45.31,
+    "y": 39.6
+  },
+  {
+    "id": 41,
+    "uid": "67",
+    "nombre": "PEDRO YAIR GOMEZ RIVERA",
+    "x": 48.44,
+    "y": 47.47
+  },
+  {
+    "id": 42,
+    "uid": "83",
+    "nombre": "MIGUEL ANGEL MONTOYA CHÁVEZ",
+    "x": 60.16,
+    "y": 87.01
+  },
+  {
+    "id": 43,
+    "uid": "91",
+    "nombre": "AMISADAI PAMELA CABALLERO LÓPEZ",
+    "x": 74.61,
+    "y": 69.78
+  },
+  {
+    "id": 53,
+    "uid": "63",
+    "nombre": "CLAUDIA PAVÓN GÓMEZ",
+    "x": 57.75,
+    "y": 48.46
+  },
+  {
+    "id": 56,
+    "uid": "33",
+    "nombre": "RICARDO ISRAEL QUINTANAR CARRILLO",
+    "x": 67.32,
+    "y": 34.51
+  },
+  {
+    "id": 57,
+    "uid": "34",
+    "nombre": "GUILLERMINA JUAREZ CONTRERAS",
+    "x": 62.5,
+    "y": 52.4
+  },
+  {
+    "id": 58,
+    "uid": "36",
+    "nombre": "BLANCA ESTELA GARCIA MACIAS",
+    "x": 71.35,
+    "y": 62.24
+  },
+  {
+    "id": 59,
+    "uid": "37",
+    "nombre": "MARCO EMMANUEL MEDINA AMADOR",
+    "x": 44.92,
+    "y": 46.16
+  },
+  {
+    "id": 60,
+    "uid": "38",
+    "nombre": "EDGAR CAMACHO ACOSTA",
+    "x": 66.28,
+    "y": 59.12
+  },
+  {
+    "id": 61,
+    "uid": "39",
+    "nombre": "GEORGINA DE LA PAZ PANTOJA",
+    "x": 66.08,
+    "y": 70.44
+  },
+  {
+    "id": 62,
+    "uid": "41",
+    "nombre": "KEVIN RUBEN MARQUEZ GONZALEZ",
+    "x": 74.8,
+    "y": 44.03
+  },
+  {
+    "id": 63,
+    "uid": "73",
+    "nombre": "ROSENDO RENÉ REBOLLEDO MARQUEZ",
+    "x": 71.42,
+    "y": 69.62
+  },
+  {
+    "id": 64,
+    "uid": "89",
+    "nombre": "XOCHITL SALGADO FLORES",
+    "x": 62.76,
+    "y": 66.83
+  },
+  {
+    "id": 82,
+    "uid": "88",
+    "nombre": "VERÓNICA NOEMI NOGUERÓN SAN MIGUEL",
+    "x": 70.64,
+    "y": 44.19
+  },
+  {
+    "id": 84,
+    "uid": "42",
+    "nombre": "LILIANA ELIZABETH RAMOS ROLDAN",
+    "x": 70.9,
+    "y": 52.23
+  },
+  {
+    "id": 85,
+    "uid": "43",
+    "nombre": "JOSE ARMANDO ZAMUDIO CAMARILLO",
+    "x": 62.37,
+    "y": 33.37
+  },
+  {
+    "id": 86,
+    "uid": "44",
+    "nombre": "ALFONSO ALVARADO RAYA",
+    "x": 41.86,
+    "y": 45.83
+  },
+  {
+    "id": 87,
+    "uid": "45",
+    "nombre": "JULIETA DEL CONSUELO ROJAS PEÑA",
+    "x": 66.02,
+    "y": 51.74
+  },
+  {
+    "id": 88,
+    "uid": "46",
+    "nombre": "JUAN PEDRO ESPINOZA CASTELLANOS",
+    "x": 66.28,
+    "y": 41.08
+  },
+  {
+    "id": 91,
+    "uid": "94",
+    "nombre": "Titular de la Subjefatura de División de Transparencia y Certificación",
+    "x": 80.47,
+    "y": 69.62
+  },
+  {
+    "id": 92,
+    "uid": "95",
+    "nombre": "ROSA MARÍA RODRÍGUEZ PADRÓN",
+    "x": 52.28,
+    "y": 35.66
+  },
+  {
+    "id": 93,
+    "uid": "96",
+    "nombre": "ARLETH SÁNCHEZ FRANCO",
+    "x": 74.15,
+    "y": 58.3
+  }
+]
